@@ -3,20 +3,18 @@
    <head>
       <meta charset="utf-8">
       <title>phase 0</title>
-      <script src="scripts/gl-matrix.js"></script>
-      <script src="scripts/phoria-util.js"></script>
-      <script src="scripts/phoria-entity.js"></script>
-      <script src="scripts/phoria-scene.js"></script>
-      <script src="scripts/phoria-renderer.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
-      <script src="scripts/dat.gui.min.js"></script>
-      <script src="game.js"></script>
-		<style>
-		#canvas:-webkit-full-screen {
-		width: 100%;
-		height: 100%;
-		}
-		</style>
+      
+	  <script src="static/scripts/gl-matrix.js"></script>
+      <script src="static/scripts/phoria-util.js"></script>
+      <script src="static/scripts/phoria-entity.js"></script>
+      <script src="static/scripts/phoria-scene.js"></script>
+      <script src="static/scripts/phoria-renderer.js"></script>
+      <script src="static/scripts/dat.gui.min.js"></script>
+      <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+
+	  
+      <script src="static/game.js"></script>
+		
    </head>
    
    <body style="background-color: #bfbfbf">

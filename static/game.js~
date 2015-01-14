@@ -73,7 +73,7 @@ function init()
    
    var re_draw = function(){
 	//console.log('draw ', player_id.length);
-	console.log('first coor', player_pos[0]);
+	//console.log('first coor', player_pos[i]);
 	for (var i=0; i < player_id.length; i++){
    		draw_cube(player_pos[i])
    	}
