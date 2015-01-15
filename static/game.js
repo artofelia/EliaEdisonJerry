@@ -50,21 +50,24 @@ function init()
    var draw_cube = function(pos){
 	var c = Phoria.Util.generateUnitCube();
   	var cube = Phoria.Entity.create({
-      	 points: c.points,
-     	 edges: c.edges,
-      	 polygons: c.polygons
-   	});
-	   for (var i=0; i<6; i++)
-	   {
-	      cube.textures.push(bitmaps[i]);
-	      cube.polygons[i].texture = i;
-	   }
-	   scene.graph.push(cube);
-	   scene.graph.push(Phoria.DistantLight.create({
-	      direction: {x:pos[0], y:pos[1], z:pos[2]}
-	   }));
+	      	 points: c.points,
+	     	 edges: c.edges,
+	      	 polygons: c.polygons
+	   	});
+	for (var i=0; i<6; i++)
+	{
+	   cube.textures.push(bitmaps[i]);
+	   cube.polygons[i].texture = i;
+	}
+	scene.graph.push(cube);
+	console.log(pos);
+	cube.identity().translateX(pos[0]);
+	cube.identity().translateY(pos[1]);
+	cube.identity().translateZ(pos[2]);
    }
-   var my_pos = vec3.fromValues(0,0,0);
+
+   var my_pos = vec3.fromValues(Math.random()*20-10,Math.random()*20-10,Math.random()*20-10);
+   console.log('inital position', my_pos[i]);
    var my_id = -1;
    //draw_cube([0.0, 5.0, -15.0]);
    var player_pos = []
@@ -73,8 +76,9 @@ function init()
    
    var re_draw = function(){
 	//console.log('draw ', player_id.length);
-	console.log('first coor', player_pos[0]);
+	//console.log('first coor', player_pos[0]);
 	for (var i=0; i < player_id.length; i++){
+		console.log('drawing', player_pos[i]);
    		draw_cube(player_pos[i])
    	}
    }
@@ -89,18 +93,30 @@ function init()
    socket.on('set_id', function(msg) {
     	my_id = msg['id'];
    });
+   socket.on('set_players', function(msg) {
+    	console.log('setting player', msg['player_id'].length)
+	for(var i = 0; i < msg['player_id'].length; i++){
+		player_id.push(msg['player_id'][i]);
+		player_pos.push(msg['player_pos'][i]);
+	}
+   });
+
    socket.on('my response', function(msg) {
 	console.log(msg);
    });
    socket.on('playerAdded', function(pinfo) {
-        console.log('player added');
-	player_id.push(pinfo['id']);
-        player_pos.push(pinfo['pos']);
+	if (pinfo['id'] != my_id){
+        	console.log('player added');
+		player_id.push(pinfo['id']);
+        	player_pos.push(pinfo['pos']);
+	}
    });
    socket.on('playerMoved', function(pinfo) {
-	ind = player_id.indexOf(pinfo['id']);
-    	player_pos[ind] = pinfo['pos'];
-        console.log('player moved', player_pos[ind]);
+	if (pinfo['id'] != my_id){
+		ind = player_id.indexOf(pinfo['id']);
+	    	player_pos[ind] = pinfo['pos'];
+		console.log('player moved', player_pos[ind]);
+	}
    });
 
 

@@ -34,6 +34,8 @@ def test_disconnect():
 @socketio.on('addPlayer', namespace='/test')
 def addPlayer(pinfo):
     global id
+
+    emit('set_players', {'player_id':player_id, 'player_pos':player_pos})
     id = id+1
     player_id.append(id)
     player_pos.append(pinfo['pos'])
@@ -43,6 +45,7 @@ def addPlayer(pinfo):
 
 @socketio.on('pmove', namespace='/test')
 def addPlayer(pinfo):
+    print 'player moved'
     ind = player_id.index(pinfo['id'])
     player_pos[ind] = pinfo['pos']
     emit('playerMoved', {'id':pinfo['id'], 'pos': pinfo['pos']}, broadcast=True)
