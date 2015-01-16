@@ -29,7 +29,43 @@ function init()
    scene.perspective.aspect = canvas.width / canvas.height;
    scene.viewport.width = canvas.width;
    scene.viewport.height = canvas.height;
+  
+      /**
+    * @param forward {vec3}   Forward movement offset
+    * @param heading {float}  Heading in Phoria.RADIANS
+    * @param lookAt {vec3}    Lookat projection offset from updated position
+    */
+   var fnPositionLookAt = function positionLookAt(forward, heading, lookAt) {
+      // recalculate camera position based on heading and forward offset
+      var pos = vec3.fromValues(
+         scene.camera.position.x,
+         scene.camera.position.y,
+         scene.camera.position.z);
+      var ca = Math.cos(heading), sa = Math.sin(heading);
+      var rx = forward[0]*ca - forward[2]*sa,
+          rz = forward[0]*sa + forward[2]*ca;
+      forward[0] = rx;
+      forward[2] = rz;
+      vec3.add(pos, pos, forward);
+      scene.camera.position.x = pos[0];
+      scene.camera.position.y = pos[1];
+      scene.camera.position.z = pos[2];
+      console.log('cam pos', pos);
+      // calcuate rotation based on heading - apply to lookAt offset vector
+      rx = lookAt[0]*ca - lookAt[2]*sa,
+      rz = lookAt[0]*sa + lookAt[2]*ca;
+      vec3.add(pos, pos, vec3.fromValues(rx, lookAt[1], rz));
+      console.log(forward);
+      console.log('change ', vec3.fromValues(rx, lookAt[1], rz));
+      // set new camera look at
+      scene.camera.lookat.x = pos[0];
+      scene.camera.lookat.y = pos[1];
+      scene.camera.lookat.z = pos[2];
+      return pos;
+   }
    
+   // key binding
+
    // create a canvas renderer
    var renderer = new Phoria.CanvasRenderer(canvas);
    
@@ -47,29 +83,36 @@ function init()
       }
    }));
    
+  var player_cube = []  
    var draw_cube = function(pos){
-	var c = Phoria.Util.generateUnitCube();
+	/*var c = Phoria.Util.generateUnitCube();
   	var cube = Phoria.Entity.create({
 	      	 points: c.points,
 	     	 edges: c.edges,
 	      	 polygons: c.polygons
-	   	});
-	for (var i=0; i<6; i++)
-	{
-	   cube.textures.push(bitmaps[i]);
-	   cube.polygons[i].texture = i;
+	   	});*/
+	for (var j=0; i<player_cube.length; i++){
+		cube = player_cube[j];
+		for (var i=0; i<6; i++)
+		{
+		   cube.textures.push(bitmaps[i]);
+		   cube.polygons[i].texture = i;
+		}
+		//console.log(pos);
+		cube.identity().translateX(pos[0]);
+		cube.identity().translateY(pos[1]);
+		cube.identity().translateZ(pos[2]);
 	}
-	scene.graph.push(cube);
-	console.log(pos);
-	cube.identity().translateX(pos[0]);
-	cube.identity().translateY(pos[1]);
-	cube.identity().translateZ(pos[2]);
    }
 
-   var my_pos = vec3.fromValues(Math.random()*20-10,Math.random()*20-10,Math.random()*20-10);
-   console.log('inital position', my_pos[i]);
+   var mi = 50;
+   var heading = 0.0;
+   var lookAt = vec3.fromValues(0,5,-15);
+   var my_pos = fnPositionLookAt(vec3.fromValues(0,0,0), heading, lookAt);
+   console.log('inital position', my_pos);
+
+
    var my_id = -1;
-   //draw_cube([0.0, 5.0, -15.0]);
    var player_pos = []
    var player_id = []
    //draw players
@@ -78,7 +121,7 @@ function init()
 	//console.log('draw ', player_id.length);
 	//console.log('first coor', player_pos[0]);
 	for (var i=0; i < player_id.length; i++){
-		console.log('drawing', player_pos[i]);
+		//console.log('drawing', player_pos[i]);
    		draw_cube(player_pos[i])
    	}
    }
@@ -109,6 +152,14 @@ function init()
         	console.log('player added');
 		player_id.push(pinfo['id']);
         	player_pos.push(pinfo['pos']);
+		var c = Phoria.Util.generateUnitCube();
+  		var cube = Phoria.Entity.create({
+	      	 points: c.points,
+	     	 edges: c.edges,
+	      	 polygons: c.polygons
+	   	});
+		scene.graph.push(cube);
+		player_cube.push(cube);
 	}
    });
    socket.on('playerMoved', function(pinfo) {
@@ -125,10 +176,6 @@ function init()
    var fnAnimate = function() {
       if (!pause)
       {
-         // rotate local matrix of the cube
-         //cube.rotateY(0.5*Phoria.RADIANS);
-         
-         // execute the model view 3D pipeline and render the scene
          re_draw();
          scene.modelView();
          renderer.render(scene);
@@ -137,44 +184,9 @@ function init()
    };
    
    // keep track of heading to generate position
-   var heading = 0.0;
-   var lookAt = vec3.fromValues(0,-5,15);
-   var mx = -1;
-	var my = -1;
-   var pmx = -1;
-   var pmy = -1;
-   /**
-    * @param forward {vec3}   Forward movement offset
-    * @param heading {float}  Heading in Phoria.RADIANS
-    * @param lookAt {vec3}    Lookat projection offset from updated position
-    */
-   var fnPositionLookAt = function positionLookAt(forward, heading, lookAt) {
-      // recalculate camera position based on heading and forward offset
-      var pos = vec3.fromValues(
-         scene.camera.position.x,
-         scene.camera.position.y,
-         scene.camera.position.z);
-      var ca = Math.cos(heading), sa = Math.sin(heading);
-      var rx = forward[0]*ca - forward[2]*sa,
-          rz = forward[0]*sa + forward[2]*ca;
-      forward[0] = rx;
-      forward[2] = rz;
-      vec3.add(pos, pos, forward);
-      scene.camera.position.x = pos[0];
-      scene.camera.position.y = pos[1];
-      scene.camera.position.z = pos[2];
-      // calcuate rotation based on heading - apply to lookAt offset vector
-      rx = lookAt[0]*ca - lookAt[2]*sa,
-      rz = lookAt[0]*sa + lookAt[2]*ca;
-      vec3.add(pos, pos, vec3.fromValues(rx, lookAt[1], rz));
-      // set new camera look at
-      scene.camera.lookat.x = pos[0];
-      scene.camera.lookat.y = pos[1];
-      scene.camera.lookat.z = pos[2];
-      return pos;
-   }
-   
-   // key binding
+ 
+ 
+
    document.addEventListener('keydown', function(e) {
       switch (e.keyCode)
       {
@@ -184,21 +196,25 @@ function init()
          case 87: // W
             // move forward along current heading
             my_pos = fnPositionLookAt(vec3.fromValues(0,0,1), heading, lookAt);
-	    //console.log(my_pos[2]);
+	    console.log(my_pos);
             socket.emit('pmove', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
             break;
          case 83: // S
             // move back along current heading
             my_pos = fnPositionLookAt(vec3.fromValues(0,0,-1), heading, lookAt);
+            socket.emit('pmove', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
             break;
          case 65: // A
             // strafe left from current heading
             my_pos = fnPositionLookAt(vec3.fromValues(-1,0,0), heading, lookAt);
-            break;
+            
+            socket.emit('pmove', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
+	    break;
          case 68: // D
             // strafe right from current heading
-            my_pos = fnPositionLookAt(vec3.fromValues(1,0,0), heading, lookAt);
-            break;
+            my_pos = fnPositionLookAt(vec3.fromValues(1,0,0), heading, lookAt);       
+            socket.emit('pmove', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
+	    break;
          case 37: // LEFT
             // turn left
             heading += Phoria.RADIANS*4;
