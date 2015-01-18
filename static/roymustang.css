@@ -1,0 +1,29 @@
+.center{
+    text-align: center;
+    text-color: black;
+    font-weight: bold;
+}
+
+
+body{
+    background-color: #0000CD
+    text-align: center;
+    text-color: black;
+}
+
+a:link{
+    color: #FF000;
+}
+
+a:visited{
+    color: #00FF00;
+}
+
+a:hover {
+    color: #FF00FF;
+    font-weight: bold;
+}
+
+a:active{
+    color: #0000FF;
+}
