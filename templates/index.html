@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> FPS </title>
+    <meta charset="UTF-8">
+  </head>
+
+  <body style="background-color: #bfbfbf">
+    <canvas id="canvas" width="800" height="600" style="background-color: #eee"></canvas>
+
+    <!--These are the scrips from Phoria to render the 3D graphics-->
+
+    <script src="static/scripts/gl-matrix.js"></script>
+    <script src="static/scripts/phoria-util.js"></script>
+    <script src="static/scripts/phoria-entity.js"></script>
+    <script src="static/scripts/phoria-scene.js"></script>
+    <script src="static/scripts/phoria-renderer.js"></script>
+    <script src="static/scripts/dat.gui.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+  
+    <!--Load the rendering-->
+    <script src="static/game.js"></script>
+
+    <!--This is the script to implement the Facebook Login from the API -->
+    <script src="static/login.js"></script>
+
+    <!--The actual HTML/CSS layout-->
+    <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+    </fb:login-button>
+
+    <div id="status">
+    </div>
+
+  </body>
+
+</html>
