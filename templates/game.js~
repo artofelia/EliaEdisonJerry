@@ -2,12 +2,7 @@
 var requestAnimFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
                        window.mozRequestAnimationFrame || window.msRequestAnimationFrame || 
                        function(c) {window.setTimeout(c, 15)};
-/**
-   Phoria
-   pho·ri·a (fôr-)
-   n. The relative directions of the eyes during binocular fixation on a given object
-*/
-// bind to window onload event
+
 window.addEventListener('load', onloadHandler, false);
 var bitmaps = [];
 function onloadHandler()
@@ -21,6 +16,7 @@ function onloadHandler()
    }
    loader.onLoadCallback(init);
 }
+
 function init()
 {
    // get the canvas DOM element and the 2D drawing context
@@ -28,8 +24,8 @@ function init()
 	canvas.requestPointerLock = canvas.requestPointerLock ||
                             canvas.mozRequestPointerLock ||
                             canvas.webkitRequestPointerLock;
-	console.log(canvas.requestPointerLock)
 	canvas.requestPointerLock()	
+	console.log(document.mozPointerLockElement)
 	if(document.pointerLockElement === canvas ||
 	  document.mozPointerLockElement === canvas ||
 	  document.webkitPointerLockElement === canvas) {
@@ -62,27 +58,49 @@ function init()
          objectsortmode: "back"
       }
    }));
-   var c = Phoria.Util.generateUnitCube();
-   var cube = Phoria.Entity.create({
-      points: c.points,
-      edges: c.edges,
-      polygons: c.polygons
-   });
-   for (var i=0; i<6; i++)
-   {
-      cube.textures.push(bitmaps[i]);
-      cube.polygons[i].texture = i;
+   
+   var draw_cube = function(pos){
+	var c = Phoria.Util.generateUnitCube();
+  	var cube = Phoria.Entity.create({
+      	 points: c.points,
+     	 edges: c.edges,
+      	 polygons: c.polygons
+   	});
+	   for (var i=0; i<6; i++)
+	   {
+	      cube.textures.push(bitmaps[i]);
+	      cube.polygons[i].texture = i;
+	   }
+	   scene.graph.push(cube);
+	   scene.graph.push(Phoria.DistantLight.create({
+	      direction: {x:pos[0], y:pos[1], z:pos[2]}
+	   }));
    }
-   scene.graph.push(cube);
-   scene.graph.push(Phoria.DistantLight.create({
-      direction: {x:0, y:-0.5, z:1}
-   }));
+   var my_pos = vec3.fromValues(0,0,0);
+   var my_id = -1;
+   draw_cube([0.0, 5.0, -15.0]);
+   var player_pos = []
+   //draw players
+   for (var i=0; i<player_pos.length; i++){
+   	draw_cube(player_pos)
+   }
+   var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+            socket.on('connect', function() {
+                socket.emit('addPlayer', {'pos': [my_pos[0], my_pos[1], my_pos[2]]});
+            });
+            // event handler for server sent data
+            // the data is displayed in the "Received" section of the page
+            socket.on('set_id', function(msg) {
+                my_id = msg['id'];
+            });
+
+
    var pause = false;
    var fnAnimate = function() {
       if (!pause)
       {
          // rotate local matrix of the cube
-         cube.rotateY(0.5*Phoria.RADIANS);
+         //cube.rotateY(0.5*Phoria.RADIANS);
          
          // execute the model view 3D pipeline and render the scene
          scene.modelView();
