@@ -18,16 +18,14 @@ print 'Server Has Begun'
 
 @app.route('/test')
 def index():
-    print 'start'
     return render_template('index.html')
-    #return 'hi'
 
 @socketio.on('connect', namespace='/test')
-def test_connect():
+def connect():
     emit('my response', {'data': 'Connected'})
 
 @socketio.on('disconnect', namespace='/test')
-def test_disconnect():
+def disconnect():
     print('Client disconnected')
 
 @socketio.on('addPlayer', namespace='/test')
@@ -36,28 +34,39 @@ def addPlayer(pinfo):
     global players
     emit('set_players', players)
     id = id+1
-    players[chr(id)] = {'id': id, 'pos': pinfo['pos'], 'heading': pinfo['heading']}
+    ky = chr(id)
+    players[ky] = {'id': id, 'pos': pinfo['pos'], 'heading': pinfo['heading']}
     print 'add player', id
     emit('set_id', {'id':id})
-    emit('playerAdded', {'key': chr(id), 'data': players[chr(id)]}, broadcast=True)
+    emit('playerAdded', {'key': ky, 'data': players[ky]}, broadcast=True)
 
+
+@socketio.on('removePlayer', namespace='/test')
+def removePlayer(pinfo):
+    global id
+    global players
+    ky = chr(pinfo['id'])
+    del players[ky]
+    print pinfo['id'], 'left'
+    emit('playerLeft', {'key': ky, 'data': pinfo['id']}, broadcast=True)
+    
+    
 @socketio.on('playerMoved', namespace='/test')
 def playerMoved(pinfo):
     global players
     ky = chr(pinfo['id'])
     players[ky]['pos'] = pinfo['pos']
-    print 'player ', id, ' moved to', players[ky]['pos']
-    emit('playerMoved', {'key': chr(id), 'data': {'id':pinfo['id'], 'pos': pinfo['pos']}}, broadcast=True)
+    #print 'player ', id, ' moved to', players[ky]['pos']
+    emit('playerMoved', {'key': ky, 'data': {'id':pinfo['id'], 'pos': pinfo['pos']}}, broadcast=True)
     
 @socketio.on('playerTurned', namespace='/test')
 def playerTurned(pinfo):
     global players
     ky = chr(pinfo['id'])
-    print 'turn',players[ky], pinfo
+    #print 'turn',players[ky], pinfo
     players[ky]['heading'] = pinfo['heading']
-    emit('playerTurned', {'key': chr(id), 'data': {'id':pinfo['id'], 'heading': pinfo['heading']}}, broadcast=True)
+    emit('playerTurned', {'key': ky, 'data': {'id':pinfo['id'], 'heading': pinfo['heading']}}, broadcast=True)
 
 
 if __name__ == '__main__':
-    #app.run(host="0.0.0.0",port=8000)
     socketio.run(app)
