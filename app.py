@@ -11,8 +11,7 @@ app.debug = True
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
-player_id = []
-player_pos = []
+players = {}
 
 id = 0
 print 'Server Has Begun'
@@ -34,22 +33,30 @@ def test_disconnect():
 @socketio.on('addPlayer', namespace='/test')
 def addPlayer(pinfo):
     global id
-
-    emit('set_players', {'player_id':player_id, 'player_pos':player_pos})
+    global players
+    emit('set_players', players)
     id = id+1
-    player_id.append(id)
-    player_pos.append(pinfo['pos'])
+    players[chr(id)] = {'id': id, 'pos': pinfo['pos'], 'heading': pinfo['heading']}
     print 'add player', id
-    print 'added player pos is', pinfo['pos']
     emit('set_id', {'id':id})
-    emit('playerAdded', {'id':id, 'pos': pinfo['pos']}, broadcast=True)
+    emit('playerAdded', {'key': chr(id), 'data': players[chr(id)]}, broadcast=True)
 
-@socketio.on('pmove', namespace='/test')
-def pmove(pinfo):
-    print 'player moved'
-    ind = player_id.index(pinfo['id'])
-    player_pos[ind] = pinfo['pos']
-    emit('playerMoved', {'id':pinfo['id'], 'pos': pinfo['pos']}, broadcast=True)
+@socketio.on('playerMoved', namespace='/test')
+def playerMoved(pinfo):
+    global players
+    ky = chr(pinfo['id'])
+    players[ky]['pos'] = pinfo['pos']
+    print 'player ', id, ' moved to', players[ky]['pos']
+    emit('playerMoved', {'key': chr(id), 'data': {'id':pinfo['id'], 'pos': pinfo['pos']}}, broadcast=True)
+    
+@socketio.on('playerTurned', namespace='/test')
+def playerTurned(pinfo):
+    global players
+    ky = chr(pinfo['id'])
+    print 'turn',players[ky], pinfo
+    players[ky]['heading'] = pinfo['heading']
+    emit('playerTurned', {'key': chr(id), 'data': {'id':pinfo['id'], 'heading': pinfo['heading']}}, broadcast=True)
+
 
 
 if __name__ == '__main__':
