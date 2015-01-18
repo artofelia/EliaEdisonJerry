@@ -25,11 +25,10 @@ function init()
    
    // create the scene and setup camera, perspective and viewport
    var scene = new Phoria.Scene();
-   scene.camera.position = {x:0.0, y:5.0, z:-15.0};
+   scene.camera.position = {x:-10.0, y:5.0, z:-15.0};
    scene.perspective.aspect = canvas.width / canvas.height;
    scene.viewport.width = canvas.width;
    scene.viewport.height = canvas.height;
-  
       /**
     * @param forward {vec3}   Forward movement offset
     * @param heading {float}  Heading in Phoria.RADIANS
@@ -50,17 +49,16 @@ function init()
       scene.camera.position.x = pos[0];
       scene.camera.position.y = pos[1];
       scene.camera.position.z = pos[2];
-      console.log('cam pos', pos);
+      //console.log('cam pos', pos);
       // calcuate rotation based on heading - apply to lookAt offset vector
       rx = lookAt[0]*ca - lookAt[2]*sa,
       rz = lookAt[0]*sa + lookAt[2]*ca;
       vec3.add(pos, pos, vec3.fromValues(rx, lookAt[1], rz));
-      console.log(rx, rz);
-      console.log('change ', vec3.fromValues(rx, lookAt[1], rz));
       // set new camera look at
       scene.camera.lookat.x = pos[0];
       scene.camera.lookat.y = pos[1];
       scene.camera.lookat.z = pos[2];
+      //console.log('lookat ',[pos[0], pos[1], pos[2]]);
       return pos;
    }
    
@@ -83,34 +81,35 @@ function init()
       }
    }));
    
-  var player_cube = []  
-   var draw_cube = function(pos){
+  var player_cube = [];  
+   var draw_cube = function(ind){
 	/*var c = Phoria.Util.generateUnitCube();
   	var cube = Phoria.Entity.create({
 	      	 points: c.points,
 	     	 edges: c.edges,
 	      	 polygons: c.polygons
 	   	});*/
-	for (var j=0; i<player_cube.length; i++){
-		cube = player_cube[j];
+		cube = player_cube[ind];
 		for (var i=0; i<6; i++)
 		{
 		   cube.textures.push(bitmaps[i]);
 		   cube.polygons[i].texture = i;
 		}
 		//console.log(pos);
-		cube.identity().translateX(pos[0]);
-		cube.identity().translateY(pos[1]);
-		cube.identity().translateZ(pos[2]);
+		cube.identity().translate(vec3.fromValues(player_pos[ind][0], 0, player_pos[ind][2]));
+		//cube.identity().translateY(player_pos[ind][1]);
+		//cube.identity().translateZ(player_pos[ind][2]);
+		console.log('x ', player_pos[ind][0]);
 	}
-   }
 
+   //my info
    var mi = 50;
    var heading = 0.0;
-   var lookAt = vec3.fromValues(0,5,-15);
-   var my_pos = fnPositionLookAt(vec3.fromValues(0,0,0), heading, lookAt);
+   var lookAt = vec3.fromValues(0,-5,15);
+   //var my_pos = fnPositionLookAt(vec3.fromValues(0,0,1), heading, lookAt);
+   var my_pos = [scene.camera.position.x, scene.camera.position.y, scene.camera.position.z];
    console.log('inital position', my_pos);
-
+	
 
    var my_id = -1;
    var player_pos = []
@@ -122,13 +121,14 @@ function init()
 	//console.log('first coor', player_pos[0]);
 	for (var i=0; i < player_id.length; i++){
 		//console.log('drawing', player_pos[i]);
-   		draw_cube(player_pos[i])
+   		draw_cube(i)
    	}
    }
 
    var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
    socket.on('connect', function() {
 		console.log('connecting');
+			console.log('sending pos to server', my_pos);
         	socket.emit('addPlayer', {'pos': [my_pos[0], my_pos[1], my_pos[2]]});
    });
             // event handler for server sent data
@@ -137,35 +137,44 @@ function init()
     	my_id = msg['id'];
    });
    socket.on('set_players', function(msg) {
-    	console.log('setting player', msg['player_id'].length)
-	for(var i = 0; i < msg['player_id'].length; i++){
-		player_id.push(msg['player_id'][i]);
-		player_pos.push(msg['player_pos'][i]);
-	}
+    	console.log('setting prev player', msg['player_id'].length)
+		for(var i = 0; i < msg['player_id'].length; i++){
+			player_id.push(msg['player_id'][i]);
+			player_pos.push(msg['player_pos'][i]);
+			var c = Phoria.Util.generateUnitCube();
+			var cube = Phoria.Entity.create({
+				 points: c.points,
+				 edges: c.edges,
+				 polygons: c.polygons
+			});
+			scene.graph.push(cube);
+			player_cube.push(cube);
+		}
    });
-
+12
    socket.on('my response', function(msg) {
 	console.log(msg);
    });
    socket.on('playerAdded', function(pinfo) {
 	if (pinfo['id'] != my_id){
         	console.log('player added');
-		player_id.push(pinfo['id']);
+			player_id.push(pinfo['id']);
         	player_pos.push(pinfo['pos']);
-		var c = Phoria.Util.generateUnitCube();
-  		var cube = Phoria.Entity.create({
-	      	 points: c.points,
-	     	 edges: c.edges,
-	      	 polygons: c.polygons
-	   	});
-		scene.graph.push(cube);
-		player_cube.push(cube);
+			console.log('player added pos is ', pinfo['pos']);
+			var c = Phoria.Util.generateUnitCube();
+			var cube = Phoria.Entity.create({
+				 points: c.points,
+				 edges: c.edges,
+				 polygons: c.polygons
+			});
+			scene.graph.push(cube);
+			player_cube.push(cube);
 	}
    });
    socket.on('playerMoved', function(pinfo) {
 	if (pinfo['id'] != my_id){
 		ind = player_id.indexOf(pinfo['id']);
-	    	player_pos[ind] = pinfo['pos'];
+	    player_pos[ind] = pinfo['pos'];
 		console.log('player moved', player_pos[ind]);
 	}
    });
@@ -176,7 +185,8 @@ function init()
    var fnAnimate = function() {
       if (!pause)
       {
-         re_draw();
+         //console.log('animate');
+		 re_draw();
          scene.modelView();
          renderer.render(scene);
       }
@@ -196,7 +206,7 @@ function init()
          case 87: // W
             // move forward along current heading
             my_pos = fnPositionLookAt(vec3.fromValues(0,0,1), heading, lookAt);
-	    console.log(my_pos);
+			//console.log(my_pos);
             socket.emit('pmove', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
             break;
          case 83: // S

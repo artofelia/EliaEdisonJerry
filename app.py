@@ -40,11 +40,12 @@ def addPlayer(pinfo):
     player_id.append(id)
     player_pos.append(pinfo['pos'])
     print 'add player', id
+    print 'added player pos is', pinfo['pos']
     emit('set_id', {'id':id})
     emit('playerAdded', {'id':id, 'pos': pinfo['pos']}, broadcast=True)
 
 @socketio.on('pmove', namespace='/test')
-def addPlayer(pinfo):
+def pmove(pinfo):
     print 'player moved'
     ind = player_id.index(pinfo['id'])
     player_pos[ind] = pinfo['pos']
