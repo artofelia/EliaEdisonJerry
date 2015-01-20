@@ -16,7 +16,7 @@ players = {}
 id = 0
 print 'Server Has Begun'
 
-@app.route('/test')
+@app.route('/')
 def index():
     return render_template('index.html')
 
