@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from gevent import monkey
 monkey.patch_all()
 
@@ -17,21 +17,21 @@ players = {}
 id = 0
 print 'Server Has Begun'
 
-@app.route('/test')
+@app.route('/')
 def index():
     print 'start'
     return render_template('index.html')
     #return 'hi'
 
-@socketio.on('connect', namespace='/test')
+@socketio.on('connect', namespace='/')
 def test_connect():
     emit('my response', {'data': 'Connected'})
 
-@socketio.on('disconnect', namespace='/test')
+@socketio.on('disconnect', namespace='/')
 def test_disconnect():
     print('Client disconnected')
 
-@socketio.on('addPlayer', namespace='/test')
+@socketio.on('addPlayer', namespace='/')
 def addPlayer(pinfo):
     global id
     global players
@@ -42,7 +42,7 @@ def addPlayer(pinfo):
     emit('set_id', {'id':id})
     emit('playerAdded', {'key': chr(id), 'data': players[chr(id)]}, broadcast=True)
 
-@socketio.on('playerMoved', namespace='/test')
+@socketio.on('playerMoved', namespace='/')
 def playerMoved(pinfo):
     global players
     ky = chr(pinfo['id'])
@@ -50,7 +50,7 @@ def playerMoved(pinfo):
     print 'player ', id, ' moved to', players[ky]['pos']
     emit('playerMoved', {'key': chr(id), 'data': {'id':pinfo['id'], 'pos': pinfo['pos']}}, broadcast=True)
     
-@socketio.on('playerTurned', namespace='/test')
+@socketio.on('playerTurned', namespace='/')
 def playerTurned(pinfo):
     global players
     ky = chr(pinfo['id'])
@@ -63,16 +63,3 @@ def playerTurned(pinfo):
 if __name__ == '__main__':
     #app.run(host="0.0.0.0",port=8000)
     socketio.run(app)
-=======
-from flask import Flask, render_template
-
-app = Flask(__name__)
-
-@app.route("/")
-def index():
-    return render_template("index.html");
-
-if __name__ == "__main__":
-    app.debug = True
-    app.run(host = "0.0.0.0", port = 5000)
->>>>>>> master
