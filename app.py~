@@ -10,46 +10,74 @@ app = Flask(__name__)
 app.debug = True
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+#[[0,0,0,0],[1,1,1,0],[1,1,0,0],[1,0,0,1]]
+tmz = {(0,0): 0,(1,0): 0,(2,0): 0, (3,0): 0,
+(0,1): 1,(1,1): 1,(2,1): 1, (3,1): 0,
+(0,2): 1,(1,2): 1,(2,2): 0, (3,2): 0,
+(0,3): 1,(1,3): 0,(2,3): 0, (3,3): 1,}
 
-player_id = []
-player_pos = []
-
+players = {}
 id = 0
 print 'Server Has Begun'
 
-@app.route('/test')
+@app.route('/')
 def index():
-    print 'start'
     return render_template('index.html')
-    #return 'hi'
 
-@socketio.on('connect', namespace='/test')
-def test_connect():
+@socketio.on('connect', namespace='/')
+def connect():
     emit('my response', {'data': 'Connected'})
 
-@socketio.on('disconnect', namespace='/test')
-def test_disconnect():
+@socketio.on('disconnect', namespace='/')
+def disconnect():
     print('Client disconnected')
 
-@socketio.on('addPlayer', namespace='/test')
+@socketio.on('addPlayer', namespace='/')
 def addPlayer(pinfo):
     global id
-
-    emit('set_players', {'player_id':player_id, 'player_pos':player_pos})
+    global players
+    emit('set_players', players)
     id = id+1
-    player_id.append(id)
-    player_pos.append(pinfo['pos'])
+    ky = chr(id)
+    players[ky] = {'id': id, 'pos': pinfo['pos'], 'heading': pinfo['heading']}
     print 'add player', id
     emit('set_id', {'id':id})
-    emit('playerAdded', {'id':id, 'pos': pinfo['pos']}, broadcast=True)
+    emit('playerAdded', {'key': ky, 'data': players[ky]}, broadcast=True)
 
-@socketio.on('pmove', namespace='/test')
-def addPlayer(pinfo):
-    ind = player_id.index(pinfo['id'])
-    player_pos[ind] = pinfo['pos']
-    emit('playerMoved', {'id':pinfo['id'], 'pos': pinfo['pos']}, broadcast=True)
+@socketio.on('removePlayer', namespace='/')
+def removePlayer(pinfo):
+    global id
+    global players
+    ky = chr(pinfo['id'])
+    del players[ky]
+    print pinfo['id'], 'left'
+    emit('playerLeft', {'key': ky, 'data': pinfo['id']}, broadcast=True)
+    
+    
+@socketio.on('playerMoved', namespace='/')
+def playerMoved(pinfo):
+    global players
+    ky = chr(pinfo['id'])
+    players[ky]['pos'] = pinfo['pos']
+    #print 'player ', id, ' moved to', players[ky]['pos']
+    emit('playerMoved', {'key': ky, 'data': {'id':pinfo['id'], 'pos': pinfo['pos']}}, broadcast=True)
+    
+@socketio.on('playerTurned', namespace='/')
+def playerTurned(pinfo):
+    global players
+    ky = chr(pinfo['id'])
+    #print 'turn',players[ky], pinfo
+    players[ky]['heading'] = pinfo['heading']
+    emit('playerTurned', {'key': ky, 'data': {'id':pinfo['id'], 'heading': pinfo['heading']}}, broadcast=True)
+
+@socketio.on('getMazeCoor', namespace='/')
+def getMazeCoor(pinfo):
+    global tmz
+    ky = chr(pinfo['id'])
+    pos = pinfo['pos']
+    print 'sending maze cor to', pinfo['id']
+    emit('mazeUpdate', {'key': ky, 'data': tmz})
 
 
 if __name__ == '__main__':
-    #app.run(host="0.0.0.0",port=8000)
     socketio.run(app)

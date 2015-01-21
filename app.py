@@ -10,13 +10,17 @@ app = Flask(__name__)
 app.debug = True
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+#[[0,0,0,0],[1,1,1,0],[1,1,0,0],[1,0,0,1]]
+tmz = {(0,0): 0,(1,0): 0,(2,0): 0, (3,0): 0,
+(0,1): 1,(1,1): 1,(2,1): 1, (3,1): 0,
+(0,2): 1,(1,2): 1,(2,2): 0, (3,2): 0,
+(0,3): 1,(1,3): 0,(2,3): 0, (3,3): 1,}
 
 players = {}
-
 id = 0
 print 'Server Has Begun'
 
-@app.route('/')
+@app.route('/test')
 def index():
     return render_template('index.html')
 
@@ -39,7 +43,6 @@ def addPlayer(pinfo):
     print 'add player', id
     emit('set_id', {'id':id})
     emit('playerAdded', {'key': ky, 'data': players[ky]}, broadcast=True)
-
 
 @socketio.on('removePlayer', namespace='/test')
 def removePlayer(pinfo):
@@ -66,6 +69,14 @@ def playerTurned(pinfo):
     #print 'turn',players[ky], pinfo
     players[ky]['heading'] = pinfo['heading']
     emit('playerTurned', {'key': ky, 'data': {'id':pinfo['id'], 'heading': pinfo['heading']}}, broadcast=True)
+
+@socketio.on('getMazeCoor', namespace='/test')
+def getMazeCoor(pinfo):
+    global tmz
+    ky = chr(pinfo['id'])
+    pos = pinfo['pos']
+    print 'sending maze cor to', pinfo['id']
+    emit('mazeUpdate', {'key': ky, 'data': tmz})
 
 
 if __name__ == '__main__':
