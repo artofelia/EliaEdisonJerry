@@ -6,7 +6,12 @@
 
 
 body{
-    background-color: #0000CD
+    background-image: url("fps.jpg");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-color: #cccccc;
     text-align: center;
     text-color: black;
 }
