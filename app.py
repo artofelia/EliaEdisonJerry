@@ -11,14 +11,13 @@ app.debug = True
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 #[[0,0,0,0],[1,1,1,0],[1,1,0,0],[1,0,0,1]]
-tmz = {(0,0): 0,(1,0): 0,(2,0): 0, (3,0): 0,
-(0,1): 1,(1,1): 1,(2,1): 1, (3,1): 0,
-(0,2): 1,(1,2): 1,(2,2): 0, (3,2): 0,
-(0,3): 1,(1,3): 0,(2,3): 0, (3,3): 1,}
+tmzsz = 4
+tmz = [5,6,7,9,10,13,16]
 
 players = {}
 id = 0
 print 'Server Has Begun'
+print tmz
 
 @app.route('/test')
 def index():
@@ -76,7 +75,8 @@ def getMazeCoor(pinfo):
     ky = chr(pinfo['id'])
     pos = pinfo['pos']
     print 'sending maze cor to', pinfo['id']
-    emit('mazeUpdate', {'key': ky, 'data': tmz})
+    
+    emit('mazeUpdate', {'key': ky, 'data': {'sz':tmzsz, 'coor': tmz}})
 
 
 if __name__ == '__main__':

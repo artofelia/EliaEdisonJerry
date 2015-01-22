@@ -35,7 +35,7 @@ function init()
    var canvas = document.getElementById('canvas');
    // create the scene and setup camera, perspective and viewport
    var scene = new Phoria.Scene();
-   scene.camera.position = {x:0.0, y:0.0, z:0.0};
+   scene.camera.position = {x:0.0, y:5.0, z:-15.0};
    scene.perspective.aspect = canvas.width / canvas.height;
    scene.viewport.width = canvas.width;
    scene.viewport.height = canvas.height;
@@ -70,12 +70,13 @@ function init()
 		  scene.camera.lookat.y = pos[1];
 		  scene.camera.lookat.z = pos[2];
 		  //console.log('lookat ',[pos[0], pos[1], pos[2]]);
+
 		  return pos;
 	}
 
 	var renderer = new Phoria.CanvasRenderer(canvas);
    
-   // add a grid to help visualise camera position etc.
+   	// add a grid to help visualise camera position etc.
 	var plane = Phoria.Util.generateTesselatedPlane(8,16,0,20);
 	scene.graph.push(Phoria.Entity.create({
 		  points: plane.points,
@@ -104,27 +105,30 @@ function init()
 		color: [0,0,1]
 	});
 	blueLightObj.children.push(blueLight);
-	
+
+	var mzsz = -1
 	var mzcoor = [];
-	var mzsc = 25;
+	var mzsc = 2;
 	var drawMaze = function(){
-		for(var ky in mzcoor){
-			if(mzcoor[ky]==1){
-			var pl = [ky[0]*mzsc, 5, ky[1]*mzsc];
+		for(var i=0; i < mzcoor.length; i++){
+			var pt = mzcoor[i]-1;
+			var ky = [(pt-pt%mzsz)/mzsz, pt%mzsz];
+			
+			var pl = [ky[0]*mzsc, 0, ky[1]*mzsc];
+			//console.log('maze dr', mzcoor[i]);
 			var c = Phoria.Util.generateUnitCube();
 			var cube = Phoria.Entity.create({
 				points: c.points,
 				edges: c.edges,
 				polygons: c.polygons
 			});
-			for (var i=0; i<6; i++)
+			/*for (var i=0; i<6; i++)
 			{
 				cube.textures.push(bitmaps[i]);
 				cube.polygons[i].texture = i;
-			}
+			}*/
 			cube.identity().translate(vec3.fromValues(pl[0], pl[1], pl[2]));
 			scene.graph.push(cube);
-			}
 		}
 	}
 
@@ -138,16 +142,18 @@ function init()
 	//my info
 	var mi = 50;
 	var heading = 0.0;
-	var lookAt = vec3.fromValues(0,0,0);
+   	var lookAt = vec3.fromValues(0,-5,15);
 	var my_pos = [scene.camera.position.x, scene.camera.position.y, scene.camera.position.z];
-	console.log('inital position', my_pos);
+	//console.log('inital position', my_pos);
 
 	var re_draw = function(){
 		//console.log('draw ', Object.keys(players).length);
 		for (var ky in players){
 			draw_cube(ky);
+			drawMaze();
 		}
 	}
+	//var create 
 	var create_player = function(ky)
 	{
 		var c = Phoria.Util.generateUnitCube();
@@ -172,6 +178,7 @@ function init()
 	socket.on('set_id', function(msg) {
 		my_id = msg['id'];
 		console.log('MY ID IS', my_id);
+		socket.emit('getMazeCoor', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
 	});
 	socket.on('set_players', function(msg) {
 		console.log('setting prev player', Object.keys(msg).length);
@@ -211,9 +218,9 @@ function init()
 			console.log('player turned', players[ky]['heading']);
 		}
 	});
-	socket.on('mazUpdate', function(pinfo) {
-		var mzcoor = pinfo['data'];
-		
+	socket.on('mazeUpdate', function(pinfo) {
+		mzcoor = pinfo['data']['coor'];
+		mzsz = pinfo['data']['sz'];
 	});
 	
 	var pause = false;
@@ -230,13 +237,13 @@ function init()
 	
 	var moveSteps = function(){
 		socket.emit('getMazeCoor', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
-		console.log(my_pos);
-		console.log(scene.camera.position.y);
+		//console.log(my_pos);
+		//console.log(scene.camera.position.y);
 		socket.emit('playerMoved', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
 	}
 
 	document.addEventListener('keydown', function(e) {
-		console.log(e.keyCode); //84, 71
+		//console.log(e.keyCode); //84, 71
 		switch (e.keyCode)
 		{
 			case 27: // ESC

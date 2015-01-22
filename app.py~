@@ -19,20 +19,21 @@ tmz = {(0,0): 0,(1,0): 0,(2,0): 0, (3,0): 0,
 players = {}
 id = 0
 print 'Server Has Begun'
+print tmz
 
-@app.route('/')
+@app.route('/test')
 def index():
     return render_template('index.html')
 
-@socketio.on('connect', namespace='/')
+@socketio.on('connect', namespace='/test')
 def connect():
     emit('my response', {'data': 'Connected'})
 
-@socketio.on('disconnect', namespace='/')
+@socketio.on('disconnect', namespace='/test')
 def disconnect():
     print('Client disconnected')
 
-@socketio.on('addPlayer', namespace='/')
+@socketio.on('addPlayer', namespace='/test')
 def addPlayer(pinfo):
     global id
     global players
@@ -44,7 +45,7 @@ def addPlayer(pinfo):
     emit('set_id', {'id':id})
     emit('playerAdded', {'key': ky, 'data': players[ky]}, broadcast=True)
 
-@socketio.on('removePlayer', namespace='/')
+@socketio.on('removePlayer', namespace='/test')
 def removePlayer(pinfo):
     global id
     global players
@@ -54,7 +55,7 @@ def removePlayer(pinfo):
     emit('playerLeft', {'key': ky, 'data': pinfo['id']}, broadcast=True)
     
     
-@socketio.on('playerMoved', namespace='/')
+@socketio.on('playerMoved', namespace='/test')
 def playerMoved(pinfo):
     global players
     ky = chr(pinfo['id'])
@@ -62,7 +63,7 @@ def playerMoved(pinfo):
     #print 'player ', id, ' moved to', players[ky]['pos']
     emit('playerMoved', {'key': ky, 'data': {'id':pinfo['id'], 'pos': pinfo['pos']}}, broadcast=True)
     
-@socketio.on('playerTurned', namespace='/')
+@socketio.on('playerTurned', namespace='/test')
 def playerTurned(pinfo):
     global players
     ky = chr(pinfo['id'])
@@ -70,13 +71,13 @@ def playerTurned(pinfo):
     players[ky]['heading'] = pinfo['heading']
     emit('playerTurned', {'key': ky, 'data': {'id':pinfo['id'], 'heading': pinfo['heading']}}, broadcast=True)
 
-@socketio.on('getMazeCoor', namespace='/')
+@socketio.on('getMazeCoor', namespace='/test')
 def getMazeCoor(pinfo):
     global tmz
     ky = chr(pinfo['id'])
     pos = pinfo['pos']
     print 'sending maze cor to', pinfo['id']
-    emit('mazeUpdate', {'key': ky, 'data': tmz})
+    emit('mazeUpdate', {'key': ky, 'data': [1, 23, 4]})
 
 
 if __name__ == '__main__':
