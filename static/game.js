@@ -35,7 +35,7 @@ function init()
    var canvas = document.getElementById('canvas');
    // create the scene and setup camera, perspective and viewport
    var scene = new Phoria.Scene();
-   scene.camera.position = {x:0.0, y:0.0, z:0.0};
+   scene.camera.position = {x:0.0, y:5.0, z:-15.0};
    scene.perspective.aspect = canvas.width / canvas.height;
    scene.viewport.width = canvas.width;
    scene.viewport.height = canvas.height;
@@ -70,12 +70,13 @@ function init()
 		  scene.camera.lookat.y = pos[1];
 		  scene.camera.lookat.z = pos[2];
 		  //console.log('lookat ',[pos[0], pos[1], pos[2]]);
+
 		  return pos;
 	}
 
 	var renderer = new Phoria.CanvasRenderer(canvas);
    
-   // add a grid to help visualise camera position etc.
+   	// add a grid to help visualise camera position etc.
 	var plane = Phoria.Util.generateTesselatedPlane(8,16,0,20);
 	scene.graph.push(Phoria.Entity.create({
 		  points: plane.points,
@@ -100,32 +101,59 @@ function init()
 	});
 	scene.graph.push(blueLightObj);
 	var blueLight = Phoria.PointLight.create({
-		position: {x:0, y:2, z:-5},
+		position: {x:0, y:2, z:0},
 		color: [0,0,1]
 	});
 	blueLightObj.children.push(blueLight);
-	
+
+	var mzsz = -1
+	var mzcoor = [];
+	var mzsc = 2;
+	var drawMaze = function(){
+		for(var i=0; i < mzcoor.length; i++){
+			var pt = mzcoor[i]-1;
+			var ky = [(pt-pt%mzsz)/mzsz, pt%mzsz];
+			
+			var pl = [ky[0]*mzsc, 0, ky[1]*mzsc];
+			//console.log('maze dr', mzcoor[i]);
+			var c = Phoria.Util.generateUnitCube();
+			var cube = Phoria.Entity.create({
+				points: c.points,
+				edges: c.edges,
+				polygons: c.polygons
+			});
+			/*for (var i=0; i<6; i++)
+			{
+				cube.textures.push(bitmaps[i]);
+				cube.polygons[i].texture = i;
+			}*/
+			cube.identity().translate(vec3.fromValues(pl[0], pl[1], pl[2]));
+			scene.graph.push(cube);
+		}
+	}
+
+
 	var draw_cube = function(ky){
 		cube = players[ky]['cube'];
-		//console.log(players[key]['pos']);
 		//cube.identity().rotateZ(3.14/2);//players[key]['heading']*Phoria.RADIANS);
-		cube.identity().translate(vec3.fromValues(players[ky]['pos'][0], players[ky]['pos'][1], players[ky]['pos'][2]));
-		
+		cube.identity().translate(vec3.fromValues(players[ky]['pos'][0], 			players[ky]['pos'][1], players[ky]['pos'][2]));
 	}
 	
 	//my info
 	var mi = 50;
 	var heading = 0.0;
-	var lookAt = vec3.fromValues(0,-5,15);
+   	var lookAt = vec3.fromValues(0,-5,15);
 	var my_pos = [scene.camera.position.x, scene.camera.position.y, scene.camera.position.z];
-	console.log('inital position', my_pos);
+	//console.log('inital position', my_pos);
 
 	var re_draw = function(){
 		//console.log('draw ', Object.keys(players).length);
 		for (var ky in players){
 			draw_cube(ky);
+			drawMaze();
 		}
 	}
+	//var create 
 	var create_player = function(ky)
 	{
 		var c = Phoria.Util.generateUnitCube();
@@ -150,6 +178,7 @@ function init()
 	socket.on('set_id', function(msg) {
 		my_id = msg['id'];
 		console.log('MY ID IS', my_id);
+		socket.emit('getMazeCoor', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
 	});
 	socket.on('set_players', function(msg) {
 		console.log('setting prev player', Object.keys(msg).length);
@@ -189,6 +218,10 @@ function init()
 			console.log('player turned', players[ky]['heading']);
 		}
 	});
+	socket.on('mazeUpdate', function(pinfo) {
+		mzcoor = pinfo['data']['coor'];
+		mzsz = pinfo['data']['sz'];
+	});
 	
 	var pause = false;
 	var fnAnimate = function() {
@@ -201,8 +234,16 @@ function init()
 		}
 		requestAnimFrame(fnAnimate);
 	};
+	
+	var moveSteps = function(){
+		socket.emit('getMazeCoor', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
+		//console.log(my_pos);
+		//console.log(scene.camera.position.y);
+		socket.emit('playerMoved', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
+	}
+
 	document.addEventListener('keydown', function(e) {
-	//console.log(e.keyCode); //84, 71
+		//console.log(e.keyCode); //84, 71
 		switch (e.keyCode)
 		{
 			case 27: // ESC
@@ -211,34 +252,33 @@ function init()
 			case 87: // W
 				// move forward along current heading
 				my_pos = fnPositionLookAt(vec3.fromValues(0,0,1), heading, lookAt);
-				//console.log(my_pos);
-				socket.emit('playerMoved', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
+				moveSteps();
 				break;
 			case 83: // S
 				// move back along current heading
 				my_pos = fnPositionLookAt(vec3.fromValues(0,0,-1), heading, lookAt);
-				socket.emit('playerMoved', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
+				moveSteps();
 				break;
 			case 65: // A
 				// strafe left from current heading
 				my_pos = fnPositionLookAt(vec3.fromValues(-1,0,0), heading, lookAt);
-				socket.emit('playerMoved', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
+				moveSteps();
 				break;
 			case 68: // D
 				// strafe right from current heading
-				my_pos = fnPositionLookAt(vec3.fromValues(1,0,0), heading, lookAt);       
-				socket.emit('playerMoved', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
+				my_pos = fnPositionLookAt(vec3.fromValues(1,0,0), heading, lookAt);
+				moveSteps();
 				break;
 			case 84: // T
 				// move forward along current heading
 				my_pos = fnPositionLookAt(vec3.fromValues(0,1,0), heading, lookAt);
 				//console.log(my_pos);
-				socket.emit('playerMoved', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
+				moveSteps();
 				break;
 			case 71: // G
 				// move back along current heading
 				my_pos = fnPositionLookAt(vec3.fromValues(0,-1,0), heading, lookAt);
-				socket.emit('playerMoved', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
+				moveSteps();
 				break;
 			case 37: // LEFT
 				// turn left
