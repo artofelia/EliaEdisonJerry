@@ -109,7 +109,7 @@
 
       scale: function scale(vec)
       {
-	 //console.log('scaling!');
+	 console.log('scaling!');
          mat4.scale(this.matrix, this.matrix, vec);
          return this;
       },

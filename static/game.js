@@ -106,10 +106,12 @@ function init()
 	});
 	blueLightObj.children.push(blueLight);
 
-	var mzsz = -1
+	var mzsz = -1;
 	var mzcoor = [];
-	var mzsc = 2;
+	var mzsc = 2*5;
+	var mzcube = {}
 	var drawMaze = function(){
+		//console.log('dr maze');
 		for(var i=0; i < mzcoor.length; i++){
 			var pt = mzcoor[i]-1;
 			var ky = [(pt-pt%mzsz)/mzsz, pt%mzsz];
@@ -127,7 +129,9 @@ function init()
 				cube.textures.push(bitmaps[i]);
 				cube.polygons[i].texture = i;
 			}*/
-			cube.identity().translate(vec3.fromValues(pl[0], pl[1], pl[2]));
+			cube.rotateY(0.5*Phoria.RADIANS);
+			//cube.identity().scale(20);
+			cube.identity().translate(vec3.fromValues(pl[0]+scene.camera.position.x, pl[1], pl[2]));
 			scene.graph.push(cube);
 		}
 	}
@@ -148,9 +152,9 @@ function init()
 
 	var re_draw = function(){
 		//console.log('draw ', Object.keys(players).length);
+		drawMaze();
 		for (var ky in players){
 			draw_cube(ky);
-			drawMaze();
 		}
 	}
 	//var create 
@@ -218,9 +222,50 @@ function init()
 			console.log('player turned', players[ky]['heading']);
 		}
 	});
+	Array.prototype.diff = function(a) {
+   		return this.filter(function(i) {return a.indexOf(i) < 0;});
+	};
 	socket.on('mazeUpdate', function(pinfo) {
+		console.log('updating maze');
+		var prmzcoor = mzcoor;
+		console.log('old', prmzcoor);
 		mzcoor = pinfo['data']['coor'];
 		mzsz = pinfo['data']['sz'];
+		console.log('new', mzcoor);
+		var sub1 = prmzcoor.diff(mzcoor);
+		console.log('to remove', sub1);
+		for(var i=0; i<sub1.length;i++){
+			scene.graph.pull(mzcube[sub1[i]]);
+		}
+		var sub2 = mzcoor.diff(prmzcoor);
+		for(var i=0; i < sub2.length; i++){
+			var ind = sub2[i];
+			var pt = mzcoor[ind];
+			if(mzcube[pt] == undefined){
+				var ky = [(pt-pt%mzsz)/mzsz, pt%mzsz];
+			
+				var pl = [ky[0]*mzsc, 0, ky[1]*mzsc];
+				//console.log('maze dr', mzcoor[i]);
+				var c = Phoria.Util.generateUnitCube();
+				var cube = Phoria.Entity.create({
+					points: c.points,
+					edges: c.edges,
+					polygons: c.polygons
+				});
+				/*for (var i=0; i<6; i++)
+				{
+					cube.textures.push(bitmaps[i]);
+					cube.polygons[i].texture = i;
+				}*/
+				//cube.rotateY(0.5*Phoria.RADIANS);
+				//cube.identity().scale(20);
+				cube.identity().translate(vec3.fromValues(pl[0], pl[1], pl[2]));
+				mzcube[pt] = cube;			
+			}
+			
+			scene.graph.push(mzcube[pt]);
+		}
+		console.log(mzcoor);
 	});
 	
 	var pause = false;

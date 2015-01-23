@@ -10,7 +10,10 @@ app = Flask(__name__)
 app.debug = True
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
-#[[0,0,0,0],[1,1,1,0],[1,1,0,0],[1,0,0,1]]
+#[0,0,0,0]
+#[1,1,1,0]
+#[1,1,0,0]
+#[1,0,0,1]
 tmzsz = 4
 tmz = [5,6,7,9,10,13,16]
 
