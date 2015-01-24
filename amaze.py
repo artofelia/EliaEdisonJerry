@@ -2,8 +2,14 @@
 #source code: http://stackoverflow.com/questions/27017164/python-maze-generator-explanation
 
 from random import shuffle, randrange
+
+#creates a maze grid
+#the size is actually 2n+1 by 2n+1 because n represents one 2x2 cell of the maze (the +1 comes from border of the maze)
+#the maze algorithm works by moving in a random direction every recursive call
+#it checks for possible paths by either placing a wall, a path space, or backtracking
+
 def make_maze(n):
-    w = n * 2
+    w = n
     h = n
     vis = [[0] * w + [1] for _ in range(h)] + [[1] * (w + 1)]
     ver = [["+ "] * w + ['+'] for _ in range(h)] + [[]]
@@ -23,7 +29,7 @@ def make_maze(n):
     maze = ""
     for (a, b) in zip(hor, ver):
         maze = maze + (''.join(a + ['\n'] + b)) +"\n"
-
+    print maze
 
     #convert the visual maze into a list of indices where the consecutive numbers indicate places where there are walls
     maze_values = list(maze)
@@ -36,7 +42,6 @@ def make_maze(n):
 
     #return dictionary containing the maze array and the intial size of the maze
     response = {"data":  maze_array,
-                "size": n}
+                "size": (n*2) + 1}
+
     return response
-    
-make_maze(8)
