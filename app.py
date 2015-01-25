@@ -50,6 +50,7 @@ print 'Server Has Begun'
 
 @app.route('/test')
 def index():
+    #return 'hello'
     return render_template('index.html')
 
 @socketio.on('connect', namespace='/test')
