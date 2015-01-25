@@ -50,7 +50,8 @@ print 'Server Has Begun'
 
 @app.route('/test')
 def index():
-    return render_template('index.html')
+    if request.method == "GET":
+        return render_template('index.html')
 
 @socketio.on('connect', namespace='/test')
 def connect():
@@ -106,7 +107,6 @@ def getMazeCoor(pinfo):
     print 'sending maze cor to', pinfo['id']
     
     emit('mazeUpdate', {'key': ky, 'data': {'sz':tmzsz, 'coor': tmz}})
-
 
 if __name__ == '__main__':
     socketio.run(app)
