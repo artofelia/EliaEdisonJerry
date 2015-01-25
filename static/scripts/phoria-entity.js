@@ -109,13 +109,12 @@
 
       scale: function scale(vec)
       {
-	 //console.log('scaling!');
          mat4.scale(this.matrix, this.matrix, vec);
          return this;
       },
 
       scaleN: function scale(n)
-      {
+      { 
          mat4.scale(this.matrix, this.matrix, vec3.fromValues(n,n,n));
          return this;
       },
