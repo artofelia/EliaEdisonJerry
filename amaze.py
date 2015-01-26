@@ -36,9 +36,10 @@ def make_maze(n):
     maze_array = []
     count = 0
     for x in maze_values:
-        if x == "+":
-            maze_array.append(count)
-        count = count + 1
+        if x != "\n":
+            if x == "+":
+                maze_array.append(count)
+            count = count + 1
     print maze_array
 
     #return dictionary containing the maze array and the intial size of the maze
