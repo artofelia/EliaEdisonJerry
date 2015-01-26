@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>About Page</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+    <link rel="stylesheet" href="../static/style.css" type="text/css" charset="utf-8" />
+  </head>
+
+  <body>
+    <div id="container">
+      <div id="menu">
+	<ul>
+	  <li id="m01"><a href="#">Home</a></li>
+	  <li id="m02"><a href="#">About</a></li>
+	  <li id="m03"><a href="#">GitHub</a></li>
+	  <li id="m04"><a href="#">Swag</a></li>
+	  <li id="m05"><a href="#">Maze</a></li>
+	</ul>
+      </div>
+      <div id="header">
+	<div id="logo"> <a href="#"><img src="images/logo.gif" alt="logo" border="0" /></a> </div>
+	<div id="dj"></div>
+	<div id="welcome">
+	  <h2>Welcome</h2>
+	  <img src="images/welcome.gif" alt="photo 1" />
+	  <p>Welcome to the home page of the best Maze Game you'll ever play in your life! This is a 3D rendering of the classic maze solving game but with a twist! You'll be able to compete with your friends to solve this randomized maze via FaceBook!</p>
+	  <p>This is still a work in progress, so any type of suggestions or comments are greatly appreciated! Haters are not allowed.</p></div>
+	<div class="clear"></div>
+      </div>
+      <div id="middle"></div>
+      <div id="middle2"></div>
+      <div id="content">
+	<div id="left">
+	  <h2>Patches</h2>
+	  <p>TBA</p>
+	  <p>TBA</p>
+	  <p>TBA</p>
+	</div>
+	<div id="right">
+	  <h2>Photos</h2>
+	  <a href="#"><img src="images/fps.jpg" alt="photo 1" /></a> <a href="#"><img src="images/mazerun.jpg" alt="photo 2" /></a> <a href="#"><img src="images/mazerace.jpg" alt="photo 3" /></a> <a href="#"><img src="images/bigmaze.jpg" alt="photo 4" /></a> <br />
+	  <br />
+	  <a class="more" href="#">more photos</a> </div>
+	<div class="clear"></div>
+      </div>
+      <div id="footer">
+      </div>
+    </div>
+  </body>
+</html>

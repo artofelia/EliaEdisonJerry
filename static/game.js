@@ -34,8 +34,12 @@ function init()
    // get the canvas DOM element and the 2D drawing context
    var canvas = document.getElementById('canvas');
    // create the scene and setup camera, perspective and viewport
+   var acol = true; //activate collision 
    var scene = new Phoria.Scene();
    scene.camera.position = {x:0.0, y:5.0, z:-15.0};
+   console.log(scene.perspective.fov, scene.perspective.near)
+   scene.perspective.near = 5;
+   //scene.perspective.far = 1000;
    scene.perspective.aspect = canvas.width / canvas.height;
    scene.viewport.width = canvas.width;
    scene.viewport.height = canvas.height;
@@ -44,41 +48,48 @@ function init()
     * @param heading {float}  Heading in Phoria.RADIANS
     * @param lookAt {vec3}    Lookat projection offset from updated position
     */
-
+	var sp = 10;
 	var fnPositionLookAt = function positionLookAt(forward, heading, lookAt) {
 		// recalculate camera position based on heading and forward offset
 		var pos = vec3.fromValues(
 			 scene.camera.position.x,
 			 scene.camera.position.y,
 			 scene.camera.position.z);
+		var opos = vec3.fromValues(
+			 scene.camera.position.x,
+			 scene.camera.position.y,
+			 scene.camera.position.z);
 		  var ca = Math.cos(heading), sa = Math.sin(heading);
 		  var rx = forward[0]*ca - forward[2]*sa,
 			  rz = forward[0]*sa + forward[2]*ca;
-		  forward[0] = rx;
-		  forward[2] = rz;
+		  forward[0] = sp*rx;
+		  forward[2] = sp*rz;
+		  forward[1] = sp*forward[1];
 		  vec3.add(pos, pos, forward);
-		  scene.camera.position.x = pos[0];
-		  scene.camera.position.y = pos[1];
-		  scene.camera.position.z = pos[2];
-		  //console.log('cam pos', pos);
-		  // calcuate rotation based on heading - apply to lookAt offset vector
-		  rx = lookAt[0]*ca - lookAt[2]*sa,
-		  rz = lookAt[0]*sa + lookAt[2]*ca;
-		  vec3.add(pos, pos, vec3.fromValues(rx, lookAt[1], rz));
-		  // set new camera look at
-		  scene.camera.lookat.x = pos[0];
-		  scene.camera.lookat.y = pos[1];
-		  scene.camera.lookat.z = pos[2];
-		  //console.log('lookat ',[pos[0], pos[1], pos[2]]);
-
-		  return pos;
+		  if(!acol || !collide(pos)){
+			  scene.camera.position.x = pos[0];
+			  scene.camera.position.y = pos[1];
+			  scene.camera.position.z = pos[2];
+			  //console.log('cam pos', pos);
+			  // calcuate rotation based on heading - apply to lookAt offset vector
+			  rx = lookAt[0]*ca - lookAt[2]*sa,
+			  rz = lookAt[0]*sa + lookAt[2]*ca;
+			  vec3.add(pos, pos, vec3.fromValues(rx, lookAt[1], rz));
+			  // set new camera look at
+			  scene.camera.lookat.x = pos[0];
+			  scene.camera.lookat.y = pos[1];
+			  scene.camera.lookat.z = pos[2];
+			  //console.log('lookat ',[pos[0], pos[1], pos[2]]);
+			  return pos;
+		  }
+		  return opos;
 	}
 
 	var renderer = new Phoria.CanvasRenderer(canvas);
    
    	// add a grid to help visualise camera position etc.
-	var plane = Phoria.Util.generateTesselatedPlane(8,16,0,20);
-	scene.graph.push(Phoria.Entity.create({
+	var plane = Phoria.Util.generateTesselatedPlane(20,20,0,100);
+	var planeObj = Phoria.Entity.create({
 		  points: plane.points,
 		  edges: plane.edges,
 		  polygons: plane.polygons,
@@ -88,16 +99,17 @@ function init()
 			 linewidth: 0.5,
 			 objectsortmode: "back"
 		  }
-	}));
-	var blueLightObj = Phoria.Entity.create({
+	})
+	scene.graph.push(planeObj);
+	/*var blueLightObj = Phoria.Entity.create({
 		  points: [{x:0, y:0, z:0}],
 		  style: {
-			 color: [0,0,255],
+			 color: [0,255,255],
 			 drawmode: "point",
 			 shademode: "plain",
 			 linewidth: 5,
-			 linescale: 2
-		  }
+			 linescale: 2,
+			}
 	});
 	scene.graph.push(blueLightObj);
 	var blueLight = Phoria.PointLight.create({
@@ -105,44 +117,64 @@ function init()
 		color: [0,0,1]
 	});
 	blueLightObj.children.push(blueLight);
+	scene.graph.push(Phoria.DistantLight.create({
+      direction: {x:0, y:5, z:0}
+	}));
+	*/
+	var visibleLightObj = Phoria.Entity.create({
+      points: [{x:0, y:0, z:0}],
+      style: {
+         color: [0,0,255],
+         drawmode: "point",
+         shademode: "plain",
+         linewidth: 5,
+         linescale: 2
+      }
+   });
+   scene.graph.push(visibleLightObj);
+	
 
-	var mzsz = -1
+	var mzsz = -1;
 	var mzcoor = [];
-	var mzsc = 2;
-	var drawMaze = function(){
-		for(var i=0; i < mzcoor.length; i++){
-			var pt = mzcoor[i]-1;
-			var ky = [(pt-pt%mzsz)/mzsz, pt%mzsz];
-			
-			var pl = [ky[0]*mzsc, 0, ky[1]*mzsc];
-			//console.log('maze dr', mzcoor[i]);
-			var c = Phoria.Util.generateUnitCube();
-			var cube = Phoria.Entity.create({
-				points: c.points,
-				edges: c.edges,
-				polygons: c.polygons
-			});
-			/*for (var i=0; i<6; i++)
-			{
-				cube.textures.push(bitmaps[i]);
-				cube.polygons[i].texture = i;
-			}*/
-			cube.identity().translate(vec3.fromValues(pl[0], pl[1], pl[2]));
-			scene.graph.push(cube);
-		}
-	}
+	var mzsc = 2*50;
+	var mzcube = {};
 
 
 	var draw_cube = function(ky){
 		cube = players[ky]['cube'];
 		//cube.identity().rotateZ(3.14/2);//players[key]['heading']*Phoria.RADIANS);
-		cube.identity().translate(vec3.fromValues(players[ky]['pos'][0], 			players[ky]['pos'][1], players[ky]['pos'][2]));
+		cube.identity().translate(vec3.fromValues(players[ky]['pos'][0], players[ky]['pos'][1], players[ky]['pos'][2]));
+	}
+	
+	var mzCoor = function(ind){
+		var mps = [(ind-ind%mzsz)/mzsz, ind%mzsz];
+		var sf = mzsc*mzsz/2;
+		return [mps[0]*mzsc-sf, 0, mps[1]*mzsc-sf];
+	}
+	
+	var collide = function(ps){
+		//console.log('cl', ps, mzcoor.length);
+		for(var i = 0; i < mzcoor.length; i++){
+			ind = mzcoor[i];
+			var mpl = mzCoor(ind);
+			var tsz = mzsc+15;
+			//console.log('x',mpl[0]-tsz, ps[0],mpl[0]+tsz);
+			//console.log('y',mpl[1]-tsz, ps[1],mpl[1]+tsz);
+			//console.log('z',mpl[2]-tsz, ps[2],mpl[2]+tsz);
+			
+			if(ps[0]>mpl[0]-tsz && ps[0]<mpl[0]+tsz &&
+				ps[1]>mpl[1]-tsz && ps[1]<mpl[1]+tsz &&
+				ps[2]>mpl[2]-tsz && ps[2]<mpl[2]+tsz){
+					console.log('COLLIDED');
+					return true;
+				}
+		}
+		return false;
 	}
 	
 	//my info
-	var mi = 50;
 	var heading = 0.0;
-   	var lookAt = vec3.fromValues(0,-5,15);
+   	var lookAt = vec3.fromValues(0,-10,15);
 	var my_pos = [scene.camera.position.x, scene.camera.position.y, scene.camera.position.z];
 	//console.log('inital position', my_pos);
 
@@ -150,7 +182,6 @@ function init()
 		//console.log('draw ', Object.keys(players).length);
 		for (var ky in players){
 			draw_cube(ky);
-			drawMaze();
 		}
 	}
 	//var create 
@@ -218,9 +249,65 @@ function init()
 			console.log('player turned', players[ky]['heading']);
 		}
 	});
+	Array.prototype.diff = function(a) {
+   		return (this.filter(function(i) {return a.indexOf(i) < 0;}));
+	};
 	socket.on('mazeUpdate', function(pinfo) {
+		//console.log('updating maze');
+		var prmzcoor = mzcoor;
+		//console.log('old', prmzcoor);
 		mzcoor = pinfo['data']['coor'];
 		mzsz = pinfo['data']['sz'];
+		//console.log('new', mzcoor);
+		var sub1 = prmzcoor.diff(mzcoor);
+		//console.log('to remove', sub1);
+		for(var i=0; i<sub1.length;i++){
+			//scene.graph.pull(mzcube[sub1[i]]);
+		}
+		var sub2 = mzcoor.diff(prmzcoor); //maze pts to add
+		//console.log('to add', sub2);
+		for(var i=0; i < sub2.length; i++){
+			var ind = sub2[i]; //index of maze pt in mzcoor
+			//console.log('tot', Object.keys(mzcube).indexOf(ind), ind);
+			if((Object.keys(mzcube)).indexOf(ind) == -1){//to check if maze pt is already there
+				//mzcoor.appned(ind);
+				var pl = mzCoor(ind);
+				var c = Phoria.Util.generateUnitCube();
+				var cube = Phoria.Entity.create({
+					id: "Cube Blue",
+					points: c.points,
+					edges: c.edges,
+					polygons: c.polygons,
+					style: {
+						color: [0, 0, 120]
+					}
+				});
+				/*for (var i=0; i<6; i++)
+				{
+					cube.textures.push(bitmaps[i]);
+					cube.polygons[i].texture = i;
+				}*/
+				//cube.rotateY(0.5*Phoria.RADIANS);
+				cube.translate(vec3.fromValues(pl[0], pl[1], pl[2]));
+				cube.scaleN(mzsc/2);
+				mzcube[ind] = cube;
+			}
+			scene.graph.push(mzcube[ind]);
+			/*var blueLight = Phoria.PointLight.create({
+				position: {x:pl[0], y:pl[1]+mzsc*2, z:pl[2]},
+				color: [0,0,1]
+			});
+			blueLightObj.children.push(blueLight);
+			*/
+			var light = Phoria.PointLight.create({
+			  color: [0, 0, 1],
+			  position: {x:pl[0], y:pl[1]+mzsc, z:pl[2]},
+			  intensity: 1,
+			  attenuation: 0
+		   });
+		   visibleLightObj.children.push(light);
+		}
+		//console.log(mzcube)
 	});
 	
 	var pause = false;
@@ -228,6 +315,7 @@ function init()
 		if (!pause)
 		{
 			//console.log('animate');
+			//blueLightObj.identity().translate(vec3.fromValues(my_pos[0], my_pos[1], my_pos[2]));
 			re_draw();
 			scene.modelView();
 			renderer.render(scene);
@@ -235,15 +323,16 @@ function init()
 		requestAnimFrame(fnAnimate);
 	};
 	
-	var moveSteps = function(){
-		socket.emit('getMazeCoor', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
+	var moveSteps = function(nps){
+		//console.log(collide(nps));
+		my_pos = nps;
 		//console.log(my_pos);
-		//console.log(scene.camera.position.y);
+		socket.emit('getMazeCoor', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
 		socket.emit('playerMoved', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
 	}
 
 	document.addEventListener('keydown', function(e) {
-		//console.log(e.keyCode); //84, 71
+		//console.log(e.keyCode);
 		switch (e.keyCode)
 		{
 			case 27: // ESC
@@ -251,34 +340,27 @@ function init()
 				break;
 			case 87: // W
 				// move forward along current heading
-				my_pos = fnPositionLookAt(vec3.fromValues(0,0,1), heading, lookAt);
-				moveSteps();
+				moveSteps(fnPositionLookAt(vec3.fromValues(0,0,1), heading, lookAt));
 				break;
 			case 83: // S
 				// move back along current heading
-				my_pos = fnPositionLookAt(vec3.fromValues(0,0,-1), heading, lookAt);
-				moveSteps();
+				moveSteps(fnPositionLookAt(vec3.fromValues(0,0,-1), heading, lookAt));
 				break;
 			case 65: // A
 				// strafe left from current heading
-				my_pos = fnPositionLookAt(vec3.fromValues(-1,0,0), heading, lookAt);
-				moveSteps();
+				moveSteps(fnPositionLookAt(vec3.fromValues(-1,0,0), heading, lookAt));
 				break;
 			case 68: // D
 				// strafe right from current heading
-				my_pos = fnPositionLookAt(vec3.fromValues(1,0,0), heading, lookAt);
-				moveSteps();
+				moveSteps(fnPositionLookAt(vec3.fromValues(1,0,0), heading, lookAt));
 				break;
 			case 84: // T
 				// move forward along current heading
-				my_pos = fnPositionLookAt(vec3.fromValues(0,1,0), heading, lookAt);
-				//console.log(my_pos);
-				moveSteps();
+				moveSteps(fnPositionLookAt(vec3.fromValues(0,1,0), heading, lookAt));
 				break;
 			case 71: // G
 				// move back along current heading
-				my_pos = fnPositionLookAt(vec3.fromValues(0,-1,0), heading, lookAt);
-				moveSteps();
+				moveSteps(fnPositionLookAt(vec3.fromValues(0,-1,0), heading, lookAt));
 				break;
 			case 37: // LEFT
 				// turn left
@@ -306,6 +388,8 @@ function init()
 				fnPositionLookAt(vec3.fromValues(0,0,0), heading, lookAt);
 				socket.emit('playerTurned', {'id': my_id, 'heading': heading});
 				break;
+			case 67:
+				acol = !acol;
 		}
 	}, false);
 	

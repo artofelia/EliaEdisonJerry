@@ -7,10 +7,12 @@
   </head>
 
   <body style="background-color: #bfbfbf">
-    <canvas id="canvas" width="800" height="600" style="background-color: #eee"></canvas>
 
-    <!--These are the scrips from Phoria to render the 3D graphics and web sockets-->
+    <canvas id="canvas" width="900" height="800" style="background-color: #eee"></canvas>
+    
+    <!--These are the scripts from Phoria to render the 3D graphics and web sockets-->
 
+    <script src="http://127.0.0.1:8000/socket.io/socket.io.js"></script>
     <script src="static/scripts/gl-matrix.js"></script>
     <script src="static/scripts/phoria-util.js"></script>
     <script src="static/scripts/phoria-entity.js"></script>
@@ -22,15 +24,29 @@
     <!--Load the rendering-->
     <script src="static/game.js"></script>
 
+<<<<<<< HEAD
     <!--This is the script to implement the Facebook Login from the API -->
     <script src="static/login.js"></script>
 
     <!--The actual HTML/CSS layout-->
     <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
     </fb:login-button>
+=======
+    <!--This is the script to implement the Facebook Login from the API-->
+    <script src="static/login.js"></script>
 
-    <div id="status">
+    <!--The actual HTML/CSS layout-->
+    <br>
+    <br>
+    <center>
+    <fb:login-button show_faces="false" auto_logout_link="true" scope="public_profile,email" onlogin="checkLoginState();">
+    </fb:login-button>
+    <br>
+>>>>>>> 11ef3c3e74f6d570a4a0fa2f07f3c5d7fdbf84c0
+
+    <div id="players">
     </div>
+    </center>
 
   </body>
 

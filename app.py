@@ -10,28 +10,58 @@ app = Flask(__name__)
 app.debug = True
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
-#[[0,0,0,0],[1,1,1,0],[1,1,0,0],[1,0,0,1]]
-tmzsz = 4
-tmz = [5,6,7,9,10,13,16]
+ttmz = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,1,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,1,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+        [1,0,0,1,1,1,1,1,1,1,1,0,0,0,1],
+        [1,0,0,1,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,1,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,1,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,1,0,0,1,0,0,1,0,0,0,0,1],
+        [1,0,0,1,0,0,1,0,0,1,0,0,0,0,1],
+        [1,0,0,1,0,0,1,0,0,1,0,0,0,0,1],
+        [1,0,0,0,0,0,1,0,0,1,0,0,0,0,1],
+        [1,0,0,0,0,0,1,0,0,1,0,0,0,0,1],
+        [1,0,0,0,0,0,1,0,0,1,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]]
+
+def convMaze(arr):
+    #print len(arr)
+    #print len(arr[0])
+    out = []
+    ct1 = 0
+    for i in arr:
+        ct2 = 0
+        for j in arr[ct1]:
+            if arr[ct1][ct2]==1:
+                out.append(len(arr[0])*(ct1)+ct2)
+            ct2 = ct2+1
+        ct1 = ct1+1
+    return out
+    
+tmzsz = len(ttmz[0])
+tmz = convMaze(ttmz);
 
 players = {}
 id = 0
 print 'Server Has Begun'
-print tmz
+#print tmz
 
-@app.route('/test')
+@app.route('/')
 def index():
+    #return 'hello'
     return render_template('index.html')
 
-@socketio.on('connect', namespace='/test')
+@socketio.on('connect', namespace='/')
 def connect():
     emit('my response', {'data': 'Connected'})
 
-@socketio.on('disconnect', namespace='/test')
+@socketio.on('disconnect', namespace='/')
 def disconnect():
     print('Client disconnected')
 
-@socketio.on('addPlayer', namespace='/test')
+@socketio.on('addPlayer', namespace='/')
 def addPlayer(pinfo):
     global id
     global players
@@ -43,7 +73,7 @@ def addPlayer(pinfo):
     emit('set_id', {'id':id})
     emit('playerAdded', {'key': ky, 'data': players[ky]}, broadcast=True)
 
-@socketio.on('removePlayer', namespace='/test')
+@socketio.on('removePlayer', namespace='/')
 def removePlayer(pinfo):
     global id
     global players
@@ -53,7 +83,7 @@ def removePlayer(pinfo):
     emit('playerLeft', {'key': ky, 'data': pinfo['id']}, broadcast=True)
     
     
-@socketio.on('playerMoved', namespace='/test')
+@socketio.on('playerMoved', namespace='/')
 def playerMoved(pinfo):
     global players
     ky = chr(pinfo['id'])
@@ -61,7 +91,7 @@ def playerMoved(pinfo):
     #print 'player ', id, ' moved to', players[ky]['pos']
     emit('playerMoved', {'key': ky, 'data': {'id':pinfo['id'], 'pos': pinfo['pos']}}, broadcast=True)
     
-@socketio.on('playerTurned', namespace='/test')
+@socketio.on('playerTurned', namespace='/')
 def playerTurned(pinfo):
     global players
     ky = chr(pinfo['id'])
@@ -69,7 +99,7 @@ def playerTurned(pinfo):
     players[ky]['heading'] = pinfo['heading']
     emit('playerTurned', {'key': ky, 'data': {'id':pinfo['id'], 'heading': pinfo['heading']}}, broadcast=True)
 
-@socketio.on('getMazeCoor', namespace='/test')
+@socketio.on('getMazeCoor', namespace='/')
 def getMazeCoor(pinfo):
     global tmz
     ky = chr(pinfo['id'])
