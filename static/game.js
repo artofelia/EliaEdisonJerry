@@ -68,7 +68,7 @@ function init()
    scene.camera.position = {x:0.0, y:5.0, z:-15.0};
    console.log(scene.perspective.fov, scene.perspective.near)
    scene.perspective.fov = 75;
-   scene.perspective.near = 5;
+   scene.perspective.near = 1;
    //scene.perspective.far = 1000;
    scene.perspective.aspect = canvas.width / canvas.height;
    scene.viewport.width = canvas.width;
@@ -170,20 +170,20 @@ function init()
 	var mzcube = {};
 
 
-	var draw_cube = function(ky){
+	var draw_cube = function(ky){ //draws other players
 		cube = players[ky]['cube'];
 		//cube.identity().rotateZ(3.14/2);//players[key]['heading']*Phoria.RADIANS);
 		cube.identity().translate(vec3.fromValues(players[ky]['pos'][0], players[ky]['pos'][1], players[ky]['pos'][2]));
 		cube.scaleN(mzsc/4);
 	}
 	
-	var mzCoor = function(ind){
+	var mzCoor = function(ind){ //turns maze index into 3d coordinates
 		var mps = [(ind-ind%mzsz)/mzsz, ind%mzsz];
 		var sf = mzsc*mzsz/2;
 		return [mps[0]*mzsc-sf, 0, mps[1]*mzsc-sf];
 	}
 	
-	var collide = function(ps){
+	var collide = function(ps){ //check for your collision with maze
 		//console.log('cl', ps, mzcoor.length);
 		for(var i = 0; i < mzcoor.length; i++){
 			ind = mzcoor[i];
@@ -196,7 +196,7 @@ function init()
 			if(ps[0]>mpl[0]-tsz && ps[0]<mpl[0]+tsz &&
 				ps[1]>mpl[1]-tsz && ps[1]<mpl[1]+tsz &&
 				ps[2]>mpl[2]-tsz && ps[2]<mpl[2]+tsz){
-					console.log('COLLIDED');
+					//console.log('COLLIDED');
 					return true;
 				}
 		}
@@ -209,14 +209,14 @@ function init()
 	var my_pos = [scene.camera.position.x, scene.camera.position.y, scene.camera.position.z];
 	//console.log('inital position', my_pos);
 
-	var re_draw = function(){
+	var re_draw = function(){ //draw loop
 		//console.log('draw ', Object.keys(players).length);
 		for (var ky in players){
 			draw_cube(ky);
 		}
 	}
 	//var create 
-	var create_player = function(ky)
+	var create_player = function(ky) //initializes other players drawing object
 	{
 		var c = Phoria.Util.generateUnitCube();
 		var cube = Phoria.Entity.create({
@@ -237,19 +237,19 @@ function init()
 	console.log('connecting');
 	console.log('sending pos to server', my_pos);
 	socket.emit('addPlayer', {'pos': [my_pos[0], my_pos[1], my_pos[2]], 'heading': heading});
-	socket.on('set_id', function(msg) {
+	socket.on('set_id', function(msg) { //sets your id
 		my_id = msg['id'];
 		console.log('MY ID IS', my_id);
 		socket.emit('getMazeCoor', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
 	});
-	socket.on('set_players', function(msg) {
+	socket.on('set_players', function(msg) { //sets other existing players when you join
 		console.log('setting prev player', Object.keys(msg).length);
 		for(var ky in msg){
 			players[ky] = msg[ky];
 			create_player(ky);
 		}
 		});
-	socket.on('playerLeft', function(pinfo) {
+	socket.on('playerLeft', function(pinfo) { //removes player who left
 		var ky = pinfo['key'];
 		if (pinfo['data']['id'] != my_id){
 			var graph_id = players[ky]['graph_id'];
@@ -258,7 +258,7 @@ function init()
 			console.log('player left');
 		}
 	});
-	socket.on('playerAdded', function(pinfo) {
+	socket.on('playerAdded', function(pinfo) { //ad newly joined player
 		var ky = pinfo['key'];
 		if (pinfo['data']['id'] != my_id){
 			console.log('player added');
@@ -266,14 +266,14 @@ function init()
 			create_player(ky);
 		}
 	});
-	socket.on('playerMoved', function(pinfo) {
+	socket.on('playerMoved', function(pinfo) { //move other player
 		var ky = pinfo['key'];
 		if (pinfo['data']['id'] != my_id){
 			players[ky]['pos'] = pinfo['data']['pos'];
 			console.log('player moved', players[ky]['pos']);
 		}
 	});
-	socket.on('playerTurned', function(pinfo) {
+	socket.on('playerTurned', function(pinfo) { //doesnt do anything for now
 		var ky = pinfo['key'];
 		if (pinfo['data']['id'] != my_id){
 			players[ky]['heading'] = pinfo['data']['heading'];
@@ -283,7 +283,7 @@ function init()
 	Array.prototype.diff = function(a) {
    		return (this.filter(function(i) {return a.indexOf(i) < 0;}));
 	};
-	socket.on('mazeUpdate', function(pinfo) {
+	socket.on('mazeUpdate', function(pinfo){ //initalize maze coordinates
 		//console.log('updating maze');
 		var prmzcoor = mzcoor;
 		//console.log('old', prmzcoor);
@@ -310,7 +310,7 @@ function init()
 					edges: c.edges,
 					polygons: c.polygons,
 					style: {
-						color: [100,125,75]
+						color: [Math.random()*155+100,Math.random()*155+100,Math.random()*155+100]
 					}
 				});
 				/*for (var i=0; i<6; i++)
@@ -342,7 +342,7 @@ function init()
 	});
 	
 	var pause = false;
-	var fnAnimate = function() {
+	var fnAnimate = function() { //game loop
 		if (!pause)
 		{
 			//console.log('animate');
@@ -354,7 +354,7 @@ function init()
 		requestAnimFrame(fnAnimate);
 	};
 	
-	var moveSteps = function(nps){
+	var moveSteps = function(nps){ //handles your move after input
 		//console.log(collide(nps));
 		my_pos = nps;
 		//console.log(my_pos);
@@ -427,7 +427,7 @@ function init()
 	var pmy = -1;
 	var mx = 0;
 	var my = 0;
-	function turnMouse(e) {
+	function turnMouse(e) { //handles turning
 		pmx = mx;
 		pmy = my;
 		mx += e.movementX ||e.mozMovementX||e.webkitMovementX||0;
