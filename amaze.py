@@ -4,7 +4,7 @@
 from random import shuffle, randrange
 
 #creates a maze grid with a 3-wide path
-#the size is actually 3(2n+1) by 3(2n+1) because n represents one 4x2 cell of the maze (the 3 comes from the fact that the path is 3-units wide and the +1 comes from the border of the maze)
+#the size is actually 8n+1 by 8n+1) because n represents one 4x2 cell of the maze (the 8 comes from the fact that a 4x2 cell contains 8 elements and the +1 comes from the border of the maze)
 #the maze algorithm works by moving in a random direction every recursive call
 #it checks for possible paths by either placing a wall, a path space, or backtracking
 
@@ -33,13 +33,9 @@ def make_maze(n):
 
     #convert the visual maze into a list of indices where the consecutive numbers indicate places where there are walls
     maze_values = list(maze)
-    print maze_values
     maze_array = []
     count = 0
     for x in maze_values:
-        if x=="\n":
-            print 'end line', count
-            continue
         if x == "+":
             maze_array.append(count)
         count = count + 1
@@ -47,7 +43,7 @@ def make_maze(n):
 
     #return dictionary containing the maze array and the intial size of the maze
     response = {"data":  maze_array,
-                "size": 3 * ((n*2) + 1)
+                "size": (8*n) + 1
     }
 
     return response
