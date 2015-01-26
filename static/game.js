@@ -67,7 +67,7 @@ function init()
    var scene = new Phoria.Scene();
    scene.camera.position = {x:0.0, y:5.0, z:-15.0};
    console.log(scene.perspective.fov, scene.perspective.near)
-   scene.perspective.fov = 75;
+   //scene.perspective.fov = 75;
    scene.perspective.near = 1;
    //scene.perspective.far = 1000;
    scene.perspective.aspect = canvas.width / canvas.height;
@@ -173,7 +173,7 @@ function init()
 	var draw_cube = function(ky){ //draws other players
 		cube = players[ky]['cube'];
 		//cube.identity().rotateZ(3.14/2);//players[key]['heading']*Phoria.RADIANS);
-		cube.identity().translate(vec3.fromValues(players[ky]['pos'][0], players[ky]['pos'][1], players[ky]['pos'][2]));
+		cube.identity().translate(vec3.fromValues(players[ky]['pos'][0], players[ky]['pos'][1]-mzsc/4, players[ky]['pos'][2]));
 		cube.scaleN(mzsc/4);
 	}
 	
@@ -341,10 +341,22 @@ function init()
 		//console.log(mzcube)
 	});
 	
+	var incTrip = function(t){ //handles "trippyness" of maze
+		var ntrip = Math.floor(100/(1+Math.pow(Math.E, -(0.0005)*(t/25))));
+		console.log('ntrip', ntrip, t);
+		scene.perspective.fov = ntrip;
+	}
+	
 	var pause = false;
+	var d = new Date();
+	var stTime = d.getTime();
+	var time = 0;
 	var fnAnimate = function() { //game loop
 		if (!pause)
 		{
+			time = (new Date()).getTime()-stTime;
+			//console.log(time);
+			incTrip(time);
 			//console.log('animate');
 			//blueLightObj.identity().translate(vec3.fromValues(my_pos[0], my_pos[1], my_pos[2]));
 			re_draw();
