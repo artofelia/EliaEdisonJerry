@@ -49,19 +49,27 @@ print 'Server Has Begun'
 #print tmz
 
 @app.route('/')
-def index():
+def cover():
     #return 'hello'
+    return render_template('Cover.html')
+
+@app.route('/maze')
+def index():
     return render_template('index.html')
 
-@socketio.on('connect', namespace='/')
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@socketio.on('connect', namespace='/maze')
 def connect():
     emit('my response', {'data': 'Connected'})
 
-@socketio.on('disconnect', namespace='/')
+@socketio.on('disconnect', namespace='/maze')
 def disconnect():
     print('Client disconnected')
 
-@socketio.on('addPlayer', namespace='/')
+@socketio.on('addPlayer', namespace='/maze')
 def addPlayer(pinfo):
     global id
     global players
@@ -73,7 +81,7 @@ def addPlayer(pinfo):
     emit('set_id', {'id':id})
     emit('playerAdded', {'key': ky, 'data': players[ky]}, broadcast=True)
 
-@socketio.on('removePlayer', namespace='/')
+@socketio.on('removePlayer', namespace='/maze')
 def removePlayer(pinfo):
     global id
     global players
@@ -83,7 +91,7 @@ def removePlayer(pinfo):
     emit('playerLeft', {'key': ky, 'data': pinfo['id']}, broadcast=True)
     
     
-@socketio.on('playerMoved', namespace='/')
+@socketio.on('playerMoved', namespace='/maze')
 def playerMoved(pinfo):
     global players
     ky = chr(pinfo['id'])
@@ -91,7 +99,7 @@ def playerMoved(pinfo):
     #print 'player ', id, ' moved to', players[ky]['pos']
     emit('playerMoved', {'key': ky, 'data': {'id':pinfo['id'], 'pos': pinfo['pos']}}, broadcast=True)
     
-@socketio.on('playerTurned', namespace='/')
+@socketio.on('playerTurned', namespace='/maze')
 def playerTurned(pinfo):
     global players
     ky = chr(pinfo['id'])
@@ -99,7 +107,7 @@ def playerTurned(pinfo):
     players[ky]['heading'] = pinfo['heading']
     emit('playerTurned', {'key': ky, 'data': {'id':pinfo['id'], 'heading': pinfo['heading']}}, broadcast=True)
 
-@socketio.on('getMazeCoor', namespace='/')
+@socketio.on('getMazeCoor', namespace='/maze')
 def getMazeCoor(pinfo):
     global tmz
     ky = chr(pinfo['id'])
