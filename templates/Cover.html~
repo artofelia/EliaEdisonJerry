@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>About Page</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+    <link rel="stylesheet" href="../static/style.css" type="text/css" charset="utf-8" />
+  </head>
+
+  <body>
+    <div id="container">
+      <div id="menu">
+	<ul>
+	  <li id="m01"><a href="#">Home</a></li>
+	  <li id="m02"><a href="#">Photos</a></li>
+	  <li id="m03"><a href="#">Parties</a></li>
+	  <li id="m04"><a href="#">Booking</a></li>
+	  <li id="m05"><a href="#">Contact</a></li>
+	</ul>
+      </div>
+      <div id="header">
+	<div id="logo"> <a href="#"><img src="images/logo.gif" alt="logo" border="0" /></a> </div>
+	<div id="dj"></div>
+	<div id="welcome">
+	  <h2>Welcome</h2>
+	  <img src="images/welcome.gif" alt="photo 1" />
+	  <p>Swag</p>
+	  <p>Swag.</p>
+	  <a class="more" href="#">more</a> </div>
+	<div class="clear"></div>
+      </div>
+      <div id="middle"></div>
+      <div id="middle2"></div>
+      <div id="content">
+	<div id="left">
+	  <h2>News events</h2>
+	  <p>Swag.</p>
+	  <p>Swag.</p>
+	  <p>Swag.</p>
+	</div>
+	<div id="right">
+	  <h2>Photos</h2>
+	  <a href="#"><img src="images/fps.jpg" alt="photo 1" /></a> <a href="#"><img src="images/mazerun.jpg" alt="photo 2" /></a> <a href="#"><img src="images/mazerace.jpg" alt="photo 3" /></a> <a href="#"><img src="images/bigmaze.jpg" alt="photo 4" /></a> <br />
+	  <br />
+	  <a class="more" href="#">more photos</a> </div>
+	<div class="clear"></div>
+      </div>
+      <div id="footer">
+      </div>
+    </div>
+  </body>
+</html>
