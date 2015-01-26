@@ -11,10 +11,10 @@
       <div id="menu">
 	<ul>
 	  <li id="m01"><a href="#">Home</a></li>
-	  <li id="m02"><a href="#">Photos</a></li>
-	  <li id="m03"><a href="#">Parties</a></li>
-	  <li id="m04"><a href="#">Booking</a></li>
-	  <li id="m05"><a href="#">Contact</a></li>
+	  <li id="m02"><a href="#">About</a></li>
+	  <li id="m03"><a href="#">GitHub</a></li>
+	  <li id="m04"><a href="#">Swag</a></li>
+	  <li id="m05"><a href="#">Maze</a></li>
 	</ul>
       </div>
       <div id="header">
@@ -23,19 +23,18 @@
 	<div id="welcome">
 	  <h2>Welcome</h2>
 	  <img src="images/welcome.gif" alt="photo 1" />
-	  <p>Swag</p>
-	  <p>Swag.</p>
-	  <a class="more" href="#">more</a> </div>
+	  <p>Welcome to the home page of the best Maze Game you'll ever play in your life! This is a 3D rendering of the classic maze solving game but with a twist! You'll be able to compete with your friends to solve this randomized maze via FaceBook!</p>
+	  <p>This is still a work in progress, so any type of suggestions or comments are greatly appreciated! Haters are not allowed.</p></div>
 	<div class="clear"></div>
       </div>
       <div id="middle"></div>
       <div id="middle2"></div>
       <div id="content">
 	<div id="left">
-	  <h2>News events</h2>
-	  <p>Swag.</p>
-	  <p>Swag.</p>
-	  <p>Swag.</p>
+	  <h2>Patches</h2>
+	  <p>TBA</p>
+	  <p>TBA</p>
+	  <p>TBA</p>
 	</div>
 	<div id="right">
 	  <h2>Photos</h2>
