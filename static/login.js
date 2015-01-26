@@ -4,10 +4,10 @@ var username = "";
 //Get permission to use the API with our appID
 window.fbAsyncInit = function() {
     FB.init({
-	appId      : '332847230172667',
+	appId      : '854010177991198',
 	cookie     : true,
 	xfbml      : true,
-	version    : 'v2.1'
+	version    : 'v2.2'
     });
 };
 
