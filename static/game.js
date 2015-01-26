@@ -9,7 +9,7 @@ window.addEventListener('beforeunload', onunloadHandler, false);
 var bitmaps = [];   
 var my_id = -1;
 var players = {}
-var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
+var socket = io.connect('http://' + document.domain + ':' + location.port + '/maze');
 
 function onloadHandler()
 {
