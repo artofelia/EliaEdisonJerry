@@ -41,12 +41,12 @@ def convMaze(arr):
         ct1 = ct1+1
     return out
     
-tmzsz = len(ttmz[0])
-tmz = convMaze(ttmz);
+#tmzsz = len(ttmz[0])
+#tmz = convMaze(ttmz);
 
-#rawmz = amaze.make_maze(2);
-#tmzsz = rawmz['size']
-#tmz = rawmz['data']
+rawmz = amaze.make_maze(2);
+tmzsz = rawmz['size']
+tmz = rawmz['data']
 
 players = {}
 id = 0
