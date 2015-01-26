@@ -37,6 +37,9 @@ function init()
    var acol = true; //activate collision 
    var scene = new Phoria.Scene();
    scene.camera.position = {x:0.0, y:5.0, z:-15.0};
+   console.log(scene.perspective.fov, scene.perspective.near)
+   scene.perspective.near = 5;
+   //scene.perspective.far = 1000;
    scene.perspective.aspect = canvas.width / canvas.height;
    scene.viewport.width = canvas.width;
    scene.viewport.height = canvas.height;
@@ -45,7 +48,7 @@ function init()
     * @param heading {float}  Heading in Phoria.RADIANS
     * @param lookAt {vec3}    Lookat projection offset from updated position
     */
-	var sp = 50;
+	var sp = 10;
 	var fnPositionLookAt = function positionLookAt(forward, heading, lookAt) {
 		// recalculate camera position based on heading and forward offset
 		var pos = vec3.fromValues(
@@ -85,7 +88,7 @@ function init()
 	var renderer = new Phoria.CanvasRenderer(canvas);
    
    	// add a grid to help visualise camera position etc.
-	var plane = Phoria.Util.generateTesselatedPlane(50,50,0,10000);
+	var plane = Phoria.Util.generateTesselatedPlane(20,20,0,100);
 	var planeObj = Phoria.Entity.create({
 		  points: plane.points,
 		  edges: plane.edges,
@@ -98,7 +101,7 @@ function init()
 		  }
 	})
 	scene.graph.push(planeObj);
-	var blueLightObj = Phoria.Entity.create({
+	/*var blueLightObj = Phoria.Entity.create({
 		  points: [{x:0, y:0, z:0}],
 		  style: {
 			 color: [0,255,255],
@@ -111,19 +114,29 @@ function init()
 	scene.graph.push(blueLightObj);
 	var blueLight = Phoria.PointLight.create({
 		position: {x:0, y:2, z:0},
-		color: [0,0,1],
-		style: {
-			emit: 1,
-			specular: 500,
-			diffuse: 1
-		  }
+		color: [0,0,1]
 	});
 	blueLightObj.children.push(blueLight);
+	scene.graph.push(Phoria.DistantLight.create({
+      direction: {x:0, y:5, z:0}
+	}));
+	*/
+	var visibleLightObj = Phoria.Entity.create({
+      points: [{x:0, y:0, z:0}],
+      style: {
+         color: [0,0,255],
+         drawmode: "point",
+         shademode: "plain",
+         linewidth: 5,
+         linescale: 2
+      }
+   });
+   scene.graph.push(visibleLightObj);
 	
 
 	var mzsz = -1;
 	var mzcoor = [];
-	var mzsc = 2*400;
+	var mzsc = 2*50;
 	var mzcube = {};
 
 
@@ -133,12 +146,17 @@ function init()
 		cube.identity().translate(vec3.fromValues(players[ky]['pos'][0], players[ky]['pos'][1], players[ky]['pos'][2]));
 	}
 	
+	var mzCoor = function(ind){
+		var mps = [(ind-ind%mzsz)/mzsz, ind%mzsz];
+		var sf = mzsc*mzsz/2;
+		return [mps[0]*mzsc-sf, 0, mps[1]*mzsc-sf];
+	}
+	
 	var collide = function(ps){
 		//console.log('cl', ps, mzcoor.length);
 		for(var i = 0; i < mzcoor.length; i++){
 			ind = mzcoor[i];
-			var mps = [(ind-ind%mzsz)/mzsz, ind%mzsz];
-			var mpl = [mps[0]*mzsc, 0, mps[1]*mzsc];
+			var mpl = mzCoor(ind);
 			var tsz = mzsc+15;
 			//console.log('x',mpl[0]-tsz, ps[0],mpl[0]+tsz);
 			//console.log('y',mpl[1]-tsz, ps[1],mpl[1]+tsz);
@@ -253,15 +271,16 @@ function init()
 			//console.log('tot', Object.keys(mzcube).indexOf(ind), ind);
 			if((Object.keys(mzcube)).indexOf(ind) == -1){//to check if maze pt is already there
 				//mzcoor.appned(ind);
-				var ps = [(ind-ind%mzsz)/mzsz, ind%mzsz];
-				//console.log('ps', ps);
-			
-				var pl = [ps[0]*mzsc, 0, ps[1]*mzsc];
+				var pl = mzCoor(ind);
 				var c = Phoria.Util.generateUnitCube();
 				var cube = Phoria.Entity.create({
+					id: "Cube Blue",
 					points: c.points,
 					edges: c.edges,
-					polygons: c.polygons
+					polygons: c.polygons,
+					style: {
+						color: [0, 0, 120]
+					}
 				});
 				/*for (var i=0; i<6; i++)
 				{
@@ -274,6 +293,19 @@ function init()
 				mzcube[ind] = cube;
 			}
 			scene.graph.push(mzcube[ind]);
+			/*var blueLight = Phoria.PointLight.create({
+				position: {x:pl[0], y:pl[1]+mzsc*2, z:pl[2]},
+				color: [0,0,1]
+			});
+			blueLightObj.children.push(blueLight);
+			*/
+			var light = Phoria.PointLight.create({
+			  color: [0, 0, 1],
+			  position: {x:pl[0], y:pl[1]+mzsc, z:pl[2]},
+			  intensity: 1,
+			  attenuation: 0
+		   });
+		   visibleLightObj.children.push(light);
 		}
 		//console.log(mzcube)
 	});
@@ -283,7 +315,7 @@ function init()
 		if (!pause)
 		{
 			//console.log('animate');
-			blueLightObj.identity().translate(vec3.fromValues(my_pos[0], my_pos[1], my_pos[2]));
+			//blueLightObj.identity().translate(vec3.fromValues(my_pos[0], my_pos[1], my_pos[2]));
 			re_draw();
 			scene.modelView();
 			renderer.render(scene);
