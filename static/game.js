@@ -6,6 +6,8 @@ var requestAnimFrame = window.requestAnimationFrame || window.webkitRequestAnima
 window.addEventListener('load', onloadHandler, false);
 window.addEventListener('beforeunload', onunloadHandler, false);
 
+
+
 var bitmaps = [];   
 var my_id = -1;
 var players = {}
@@ -31,8 +33,60 @@ function onunloadHandler()
 
 function init()
 {
+	document.addEventListener('pointerlockchange', lockChangeAlert, false);
+	document.addEventListener('mozpointerlockchange', lockChangeAlert, false);
+	document.addEventListener('webkitpointerlockchange', lockChangeAlert, false);
+
+
+	var canvas = document.getElementById('canvas');
+		canvas.requestPointerLock = canvas.requestPointerLock ||
+		canvas.mozRequestPointerLock ||
+		canvas.webkitRequestPointerLock;
+
+	document.exitPointerLock = document.exitPointerLock ||
+			 document.mozExitPointerLock ||
+			 document.webkitExitPointerLock;
+	canvas.onclick = function() {
+		canvas.requestPointerLock();
+	}
+	function lockChangeAlert() {
+	if(document.pointerLockElement === canvas ||
+		document.mozPointerLockElement === canvas ||
+		document.webkitPointerLockElement === canvas) {
+		console.log('The pointer lock status is now locked');
+		document.addEventListener("mousemove", turnMouse, false);
+	}else{
+		console.log('The pointer lock status is now unlocked');  
+		document.removeEventListener("mousemove", turnMouse, false);
+	  }
+	}
+	var tracker = document.createElement('p');
+	var body = document.querySelector('body');
+	body.appendChild(tracker);
+	tracker.style.position = 'absolute';
+	tracker.style.top = '0';
+	tracker.style.right = '10px';
+	tracker.style.backgroundColor = 'white';
+/*
+function canvasLoop(e) {
+  var movementX = e.movementX ||
+      e.mozMovementX          ||
+      e.webkitMovementX       ||
+      0;
+
+  var movementY = e.movementY ||
+      e.mozMovementY      ||
+      e.webkitMovementY   ||
+      0;
+
+  x += movementX;
+  y += movementY; 
+
+  tracker.innerHTML = "X position: " + x + ', Y position: ' + y;
+}
+*/
+
    // get the canvas DOM element and the 2D drawing context
-   var canvas = document.getElementById('canvas');
    // create the scene and setup camera, perspective and viewport
    var acol = true; //activate collision 
    var scene = new Phoria.Scene();
@@ -125,7 +179,7 @@ function init()
 	var visibleLightObj = Phoria.Entity.create({
       points: [{x:0, y:0, z:0}],
       style: {
-         color: [0,0,255],
+         color: [255,0,0],
          drawmode: "point",
          shademode: "plain",
          linewidth: 5,
@@ -145,6 +199,7 @@ function init()
 		cube = players[ky]['cube'];
 		//cube.identity().rotateZ(3.14/2);//players[key]['heading']*Phoria.RADIANS);
 		cube.identity().translate(vec3.fromValues(players[ky]['pos'][0], players[ky]['pos'][1], players[ky]['pos'][2]));
+		cube.scaleN(mzsc/4);
 	}
 	
 	var mzCoor = function(ind){
@@ -280,7 +335,7 @@ function init()
 					edges: c.edges,
 					polygons: c.polygons,
 					style: {
-						color: [0, 0, 120]
+						color: [100,125,75]
 					}
 				});
 				/*for (var i=0; i<6; i++)
@@ -301,7 +356,7 @@ function init()
 			blueLightObj.children.push(blueLight);
 			*/
 			var light = Phoria.PointLight.create({
-			  color: [0, 0, 1],
+			  color: [Math.random(), Math.random(), Math.random()],
 			  position: {x:pl[0], y:pl[1]+mzsc, z:pl[2]},
 			  intensity: 1,
 			  attenuation: 0
@@ -328,7 +383,7 @@ function init()
 		//console.log(collide(nps));
 		my_pos = nps;
 		//console.log(my_pos);
-		socket.emit('getMazeCoor', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
+		//socket.emit('getMazeCoor', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
 		socket.emit('playerMoved', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
 	}
 
@@ -393,16 +448,20 @@ function init()
 				acol = !acol;
 		}
 	}, false);
-	
-	/* document.addEventListener('mousemove', function(e) {
-				pmx = mx;
-				pmy = my;
-				mx = e.clientX;
-				my = e.clientY;
-				heading -= (mx-pmx)/1000.0;
-				lookAt[1]-=(my-pmy)/1000.0*180/3.14;
-				fnPositionLookAt(vec3.fromValues(0,0,0), heading, lookAt);
-		}, false); */
+	var pmx = -1;
+	var pmy = -1;
+	var mx = 0;
+	var my = 0;
+	function turnMouse(e) {
+		pmx = mx;
+		pmy = my;
+		mx += e.movementX ||e.mozMovementX||e.webkitMovementX||0;
+		my += e.movementY ||e.mozMovementY||e.webkitMovementY||0;
+		//console.log(mx,my);
+		heading -= (mx-pmx)/1000.0;
+		lookAt[1]-=(my-pmy)/1000.0*180/3.14;
+		fnPositionLookAt(vec3.fromValues(0,0,0), heading, lookAt);
+	}
 		
    requestAnimFrame(fnAnimate);
 }

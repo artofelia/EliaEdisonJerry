@@ -9,7 +9,7 @@ from random import shuffle, randrange
 #it checks for possible paths by either placing a wall, a path space, or backtracking
 
 def make_maze(n):
-    w = n * 3
+    w = n*2
     h = n
     vis = [[0] * w + [1] for _ in range(h)] + [[1] * (w + 1)]
     ver = [["+   "] * w + ['+'] for _ in range(h)] + [[]]
@@ -33,12 +33,17 @@ def make_maze(n):
 
     #convert the visual maze into a list of indices where the consecutive numbers indicate places where there are walls
     maze_values = list(maze)
+    print maze_values
     maze_array = []
     count = 0
     for x in maze_values:
+        if x=="\n":
+            print 'end line', count
+            continue
         if x == "+":
             maze_array.append(count)
         count = count + 1
+    print maze_array
 
     #return dictionary containing the maze array and the intial size of the maze
     response = {"data":  maze_array,

@@ -5,6 +5,7 @@ import time
 from threading import Thread
 from flask import Flask, render_template, session, request
 from flask.ext.socketio import SocketIO, emit, send
+import amaze
 
 app = Flask(__name__)
 app.debug = True
@@ -42,6 +43,10 @@ def convMaze(arr):
     
 tmzsz = len(ttmz[0])
 tmz = convMaze(ttmz);
+
+#rawmz = amaze.make_maze(2);
+#tmzsz = rawmz['size']
+#tmz = rawmz['data']
 
 players = {}
 id = 0
