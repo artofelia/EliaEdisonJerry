@@ -18,11 +18,11 @@
 	</ul>
       </div>
       <div id="header">
-	<div id="logo"> <a href="#"><img src="images/logo.jpg" alt="logo" border="0" /></a> </div>
+	<div id="logo"> <a href="#"><img src= {{ url_for('static',filename="images/logo.jpg") }} alt="logo" border="0" /></a> </div>
 	<div id="swag"></div>
 	<div id="welcome">
 	  <h2>Why did we make this?</h2>
-	  <img src="images/welcome.gif" alt="photo 1" />
+	  <img src= {{url_for('static',filename="images/welcome.gif")}} alt="photo 1" />
 	  <p>Our team initially planned to create a FPS; a First-Person Social Network. However, as time progressed, we realized that making a social network in 3D is useless. There would be no reason to socialize in 3D since it would just be more of a hassle to get things done such as chatting or posting on a wall. It may look awesome, but it wouldn't be practical to use.</p>
 	  <p>So instead, we decided to transform whatever we had for the social-network into a 3D maze racing game that uses the FaceBook friends list. This would allow players to compete against other players through FaceBook and race against each other to test their luck and memory.</p></div>
 	<div class="clear"></div>
@@ -38,7 +38,7 @@
 	</div>
 	<div id="right">
 	  <h2>Photos</h2>
-	  <img src="images/fps.jpg" alt="photo 1" /> <img src="images/mazerun.jpg" alt="photo 2" /> <img src="images/mazerace.jpg" alt="photo 3" /> <img src="images/bigmaze.jpg" alt="photo 4" /> <br />
+	  <img src={{url_for('static',filename="images/fps.jpg")}} alt="photo 1" /> <img src={{url_for('static',filename="images/mazerun.jpg")}} alt="photo 2" /> <img src={{url_for('static',filename="images/mazerace.jpg")}} alt="photo 3" /> <img src={{url_for('static',filename="images/bigmaze.jpg")}} alt="photo 4" /> <br />
 	  <br />
 	  <a class="more" href="#">more photos</a> </div>
 	<div class="clear"></div>

@@ -18,11 +18,11 @@
 	</ul>
       </div>
       <div id="header">
-	<div id="logo"> <a href="#"><img src="images/logo.jpg" alt="logo" border="0" /></a> </div>
+	<div id="logo"> <a href="#"><img src={{url_for('static',filename="images/logo.jpg")}} alt="logo" border="0" /></a> </div>
 	<div id="swag"></div>
 	<div id="welcome">
 	  <h2>Welcome</h2>
-	  <img src="images/welcome.gif" alt="photo 1" />
+	  <img src={{url_for('static',filename="images/welcome.gif")}} alt="photo 1" />
 	  <p>Welcome to the home page of the best Maze Game you'll ever play in your life! This is a 3D rendering of the classic maze solving game but with a twist! You'll be able to compete with your friends to solve this randomized maze via FaceBook!</p>
 	  <p>This is still a work in progress, so any type of suggestions or comments are greatly appreciated! Haters are not allowed.</p></div>
 	<div class="clear"></div>
@@ -38,7 +38,7 @@
 	</div>
 	<div id="right">
 	  <h2>Photos</h2>
-	  <img src="images/fps.jpg" alt="photo 1" /> <img src="images/mazerun.jpg" alt="photo 2" /> <img src="images/mazerace.jpg" alt="photo 3" /> <img src="images/bigmaze.jpg" alt="photo 4" /> <br />
+	  <img src={{url_for('static',filename="images/fps.jpg")}} alt="photo 1" /> <img src={{url_for('static',filename="images/mazerun.jpg")}} alt="photo 2" /> <img src={{url_for('static',filename="images/mazerace.jpg")}} alt="photo 3" /> <img src={{url_for('static',filename="images/bigmaze.jpg")}} alt="photo 4" /> <br />
 	  <br />
 	  <a class="more" href="#">more photos</a> </div>
 	<div class="clear"></div>
