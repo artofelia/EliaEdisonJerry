@@ -21,7 +21,7 @@ p{	margin: 20px 0px 20px 0px;line-height: 16px;font-size: 14px;}
 	width:873px;
 }
 #menu {
-	background-image:url(images/mazerun.jpg);
+	background-image:url(images/menu.gif);
 	width:862px;
 	height:90px;
 	position:relative;
@@ -41,7 +41,7 @@ p{	margin: 20px 0px 20px 0px;line-height: 16px;font-size: 14px;}
 	font-family: verdana, arial, sans-serif;
 	font-size: 12px;
 	font-weight:bolder;
-	color:#000000;
+	color:#FFFFFF;
 	text-decoration:none;
 	text-transform: uppercase;
 }
@@ -58,8 +58,8 @@ p{	margin: 20px 0px 20px 0px;line-height: 16px;font-size: 14px;}
 	float:left;
 	display:inline;
 }
-#dj {
-	background-image:url(images/dj.jpg);
+#swag {
+	background-image:url(images/Swag.jpg);
 	width:498px;
 	height:405px;
 	float:right;
@@ -82,7 +82,7 @@ p{	margin: 20px 0px 20px 0px;line-height: 16px;font-size: 14px;}
 	border: solid 3px #FFFFFF;
 }
 #middle {
-	background-image:url(images/fps.jpg);
+	background-image:url(images/middle.gif);
 	width:873px;
 	height:21px;
 }
