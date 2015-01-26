@@ -38,6 +38,7 @@ function init()
    var scene = new Phoria.Scene();
    scene.camera.position = {x:0.0, y:5.0, z:-15.0};
    console.log(scene.perspective.fov, scene.perspective.near)
+   scene.perspective.fov = 50;
    scene.perspective.near = 5;
    //scene.perspective.far = 1000;
    scene.perspective.aspect = canvas.width / canvas.height;
