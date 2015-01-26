@@ -48,20 +48,20 @@ id = 0
 print 'Server Has Begun'
 #print tmz
 
-@app.route('/test')
+@app.route('/')
 def index():
     if request.method == "GET":
         return render_template('index.html')
 
-@socketio.on('connect', namespace='/test')
+@socketio.on('connect', namespace='/')
 def connect():
     emit('my response', {'data': 'Connected'})
 
-@socketio.on('disconnect', namespace='/test')
+@socketio.on('disconnect', namespace='/')
 def disconnect():
     print('Client disconnected')
 
-@socketio.on('addPlayer', namespace='/test')
+@socketio.on('addPlayer', namespace='/')
 def addPlayer(pinfo):
     global id
     global players
@@ -73,7 +73,7 @@ def addPlayer(pinfo):
     emit('set_id', {'id':id})
     emit('playerAdded', {'key': ky, 'data': players[ky]}, broadcast=True)
 
-@socketio.on('removePlayer', namespace='/test')
+@socketio.on('removePlayer', namespace='/')
 def removePlayer(pinfo):
     global id
     global players
@@ -83,7 +83,7 @@ def removePlayer(pinfo):
     emit('playerLeft', {'key': ky, 'data': pinfo['id']}, broadcast=True)
     
     
-@socketio.on('playerMoved', namespace='/test')
+@socketio.on('playerMoved', namespace='/')
 def playerMoved(pinfo):
     global players
     ky = chr(pinfo['id'])
@@ -91,7 +91,7 @@ def playerMoved(pinfo):
     #print 'player ', id, ' moved to', players[ky]['pos']
     emit('playerMoved', {'key': ky, 'data': {'id':pinfo['id'], 'pos': pinfo['pos']}}, broadcast=True)
     
-@socketio.on('playerTurned', namespace='/test')
+@socketio.on('playerTurned', namespace='/')
 def playerTurned(pinfo):
     global players
     ky = chr(pinfo['id'])
@@ -99,7 +99,7 @@ def playerTurned(pinfo):
     players[ky]['heading'] = pinfo['heading']
     emit('playerTurned', {'key': ky, 'data': {'id':pinfo['id'], 'heading': pinfo['heading']}}, broadcast=True)
 
-@socketio.on('getMazeCoor', namespace='/test')
+@socketio.on('getMazeCoor', namespace='/')
 def getMazeCoor(pinfo):
     global tmz
     ky = chr(pinfo['id'])
