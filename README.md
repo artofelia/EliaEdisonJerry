@@ -16,7 +16,7 @@ It will use parts of the Facebook API (getting wall posts, friendlists, etc.) an
 <br>
 Please visit the site for an in-depth About page
 <br>
-<h2> INSTRUCTIONS </h2>
+<h2> INSTRUCTIONS (IMPORTANT PLEASE READ) </h2>
 <br>
 Once on the page, use the top menu to navigate the site.
 </br>
@@ -26,7 +26,11 @@ By logging into Facebook at the bottom of the page, you may invite your friends 
 <br>
 The game will require you to lock your mouse for FPS purposes.
 <br>
-Use the mouse to change turn and the WASD keys to move. T to move up and G to go down.
+<b> To start the game, you MUST press C, W, and C again to load the controls.  </b>
+<br>
+Use the mouse to change turn and the WASD keys to move. 
+<br>
+You can cheat by flying by using T to move up and G to go down. Note once you start flying you must refresh the page to return to the non-cheating mode. 
 <br>
 Press C to activate/deactivate collisions (you must do this when you begin the game).
 <br>
@@ -39,7 +43,7 @@ Goal Dates:
 <li> 1/16/15: Server Droplet on Digital Ocean set up </li>
 <li> 1/23/15: Maze Generator completed (final additions 1/26/15) </li>
 <li> 1/24/15: Facebook API utilization completed (more features added 1/26/15) </li>
-<li> 1/26/15: Complete the game </li>
-<li> 1/26/15: Record the project video, finishing touches</li>
+<li> 1/26/15: Complete the game (mostly frontend HTML/CSS) </li>
+<li> 1/27/15: Record the project video, finishing touches</li>
 </ul>
 
