@@ -1,5 +1,5 @@
 <h1> FPS: First-Person-Socialnetwork </h1>
-<h2> Deployment Link <a href="https://104.236.15.26/"> HERE </a>
+<h2> Deployment Link <a href="104.236.15.26"> HERE </a>
 <h3> (Because Facebook saw the domain names from freedns as suspicious, we could only use an IP address to direct to our droplet) </h3>
 <br>
 <a href="https://github.com/jdai315"> Jerry Dai </a> : Facebook API, Python/HTML/Javascript, Front end
@@ -10,7 +10,7 @@
 <br>
 Our project is a 3D maze game.
 <br>
-<b> Phoria </b> (a Javascript library) will be used to render all 3D graphics
+<a href=http://www.kevs3d.co.uk/dev/phoria/"> <b> Phoria </b> </a> (a Javascript library) will be used to render all 3D graphics
 <br>
 It will use parts of the Facebook API (getting wall posts, friendlists, etc.) and Oauth.
 <br>
@@ -33,9 +33,9 @@ Goal Dates:
 <br>
 <ul>
 <li> 1/16/15: Server Droplet on Digital Ocean set up </li>
-<li> 1/23/15: Maze Generator completed</li>
+<li> 1/23/15: Maze Generator completed (final additions 1/26/15) </li>
 <li> 1/24/15: Facebook API utilization completed (more features added 1/26/15) </li>
 <li> 1/26/15: Complete the game </li>
-<li> 1/27/15: Record the project video, finishing touches</li>
+<li> 1/26/15: Record the project video, finishing touches</li>
 </ul>
 
