@@ -29,22 +29,26 @@ def make_maze(n):
     maze = ""
     for (a, b) in zip(hor, ver):
         maze = maze + (''.join(a + ['\n']) * 3) + ( ''.join(b + ["\n"]) * 3)
-    print maze
+    #print maze
 
     #convert the visual maze into a list of indices where the consecutive numbers indicate places where there are walls
     maze_values = list(maze)
     maze_array = []
+    ept_array = []
     count = 0
     for x in maze_values:
         if x != "\n":
             if x == "+":
                 maze_array.append(count)
+            else:
+                ept_array.append(count)
             count = count + 1
-    print maze_array
+    #print maze_array
 
     #return dictionary containing the maze array and the intial size of the maze
     response = {"data":  maze_array,
-                "size": (8*n) + 1
-    }
+                "size": (8*n) + 1,
+                "start": min(ept_array),
+                "end": max(ept_array)}
 
     return response

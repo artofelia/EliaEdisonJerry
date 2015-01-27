@@ -39,6 +39,7 @@ function init()
 
 
 	var canvas = document.getElementById('canvas');
+	var posbox = document.getElementById('posbox');
 		canvas.requestPointerLock = canvas.requestPointerLock ||
 		canvas.mozRequestPointerLock ||
 		canvas.webkitRequestPointerLock;
@@ -53,10 +54,10 @@ function init()
 	if(document.pointerLockElement === canvas ||
 		document.mozPointerLockElement === canvas ||
 		document.webkitPointerLockElement === canvas) {
-		console.log('The pointer lock status is now locked');
+		//console.log('The pointer lock status is now locked');
 		document.addEventListener("mousemove", turnMouse, false);
 	}else{
-		console.log('The pointer lock status is now unlocked');  
+		//console.log('The pointer lock status is now unlocked');  
 		document.removeEventListener("mousemove", turnMouse, false);
 	  }
 	}
@@ -165,6 +166,8 @@ function init()
 	
 
 	var mzsz = -1;
+	var mzst = -1;
+	var mzed = -1;
 	var mzcoor = [];
 	var mzsc = 2*50;
 	var mzcube = {};
@@ -199,6 +202,19 @@ function init()
 					//console.log('COLLIDED');
 					return true;
 				}
+		}
+		return false;
+	}
+	
+	var collideed = function(ps){ //check for your collision with maze
+		ind = mzed;
+		var mpl = mzCoor(ind);
+		var tsz = mzsc;
+		if(ps[0]>mpl[0]-tsz && ps[0]<mpl[0]+tsz &&
+			ps[1]>mpl[1]-tsz && ps[1]<mpl[1]+tsz &&
+			ps[2]>mpl[2]-tsz && ps[2]<mpl[2]+tsz){
+				//console.log('COLLIDED');
+				return true;
 		}
 		return false;
 	}
@@ -270,14 +286,14 @@ function init()
 		var ky = pinfo['key'];
 		if (pinfo['data']['id'] != my_id){
 			players[ky]['pos'] = pinfo['data']['pos'];
-			console.log('player moved', players[ky]['pos']);
+			//console.log('player moved', players[ky]['pos']);
 		}
 	});
 	socket.on('playerTurned', function(pinfo) { //doesnt do anything for now
 		var ky = pinfo['key'];
 		if (pinfo['data']['id'] != my_id){
 			players[ky]['heading'] = pinfo['data']['heading'];
-			console.log('player turned', players[ky]['heading']);
+			//console.log('player turned', players[ky]['heading']);
 		}
 	});
 	Array.prototype.diff = function(a) {
@@ -288,10 +304,31 @@ function init()
 		var prmzcoor = mzcoor;
 		//console.log('old', prmzcoor);
 		mzcoor = pinfo['data']['coor'];
+		mzst = pinfo['data']['st'];
+		mzed = pinfo['data']['ed'];
 		mzsz = pinfo['data']['sz'];
-		//console.log('new', mzcoor);
+		
+		//set up start and finish
+		var st = mzCoor(mzst);
+		var ed = mzCoor(mzed);
+		scene.camera.position = {x:st[0], y:st[1], z:st[2]};
+		//console.log('ed', ed);
+		var c = Phoria.Util.generateUnitCube();
+		var edcube = Phoria.Entity.create({
+			id: "Cube End",
+			points: c.points,
+			edges: c.edges,
+			polygons: c.polygons,
+			style: {
+				color: [255, 0, 0]
+			}
+		});
+		edcube.translate(vec3.fromValues(ed[0], ed[1], ed[2]));
+		edcube.scaleN(mzsc/4);
+		//console.log(edcube, pl);
+		scene.graph.push(edcube);
+		
 		var sub1 = prmzcoor.diff(mzcoor);
-		//console.log('to remove', sub1);
 		for(var i=0; i<sub1.length;i++){
 			//scene.graph.pull(mzcube[sub1[i]]);
 		}
@@ -302,7 +339,7 @@ function init()
 			//console.log('tot', Object.keys(mzcube).indexOf(ind), ind);
 			if((Object.keys(mzcube)).indexOf(ind) == -1){//to check if maze pt is already there
 				//mzcoor.appned(ind);
-				var pl = mzCoor(ind);
+				pl = mzCoor(ind);
 				var c = Phoria.Util.generateUnitCube();
 				var cube = Phoria.Entity.create({
 					id: "Cube Blue",
@@ -343,7 +380,7 @@ function init()
 	
 	var incTrip = function(t){ //handles "trippyness" of maze
 		var ntrip = Math.floor(100/(1+Math.pow(Math.E, -(0.0005)*(t/25))));
-		console.log('ntrip', ntrip, t);
+		//console.log('ntrip', ntrip, t);
 		scene.perspective.fov = ntrip;
 	}
 	
@@ -354,14 +391,20 @@ function init()
 	var fnAnimate = function() { //game loop
 		if (!pause)
 		{
-			time = (new Date()).getTime()-stTime;
+			posbox.innerHTML = "x: " + scene.camera.position.x + " y: " + scene.camera.position.y + " z: " + scene.camera.position.z;
+			//time = (new Date()).getTime()-stTime;
 			//console.log(time);
-			incTrip(time);
+			//incTrip(time);
 			//console.log('animate');
 			//blueLightObj.identity().translate(vec3.fromValues(my_pos[0], my_pos[1], my_pos[2]));
 			re_draw();
 			scene.modelView();
 			renderer.render(scene);
+			if(collideed(my_pos)){
+				pause = true;
+				console.log('WIN');
+				window.alert("YOU REACHED FINISH!!!!");
+			}
 		}
 		requestAnimFrame(fnAnimate);
 	};

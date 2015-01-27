@@ -44,9 +44,11 @@ def convMaze(arr):
 #tmzsz = len(ttmz[0])
 #tmz = convMaze(ttmz);
 
-rawmz = amaze.make_maze(2);
+rawmz = amaze.make_maze(4);
 tmzsz = rawmz['size']
 tmz = rawmz['data']
+tst = rawmz['start']
+ted = rawmz['end']
 
 players = {}
 id = 0
@@ -119,7 +121,7 @@ def getMazeCoor(pinfo):
     pos = pinfo['pos']
     print 'sending maze cor to', pinfo['id']
     
-    emit('mazeUpdate', {'key': ky, 'data': {'sz':tmzsz, 'coor': tmz}})
+    emit('mazeUpdate', {'key': ky, 'data': {'sz':tmzsz, 'coor': tmz, 'st': tst, 'ed': ted}})
 
 
 if __name__ == '__main__':
