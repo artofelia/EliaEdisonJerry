@@ -2,11 +2,13 @@
 <h2> Deployment Link at this IP: 104.236.15.26
 <h3> (Because Facebook saw the domain names from freedns as suspicious, we could only use an IP address to direct to our droplet) </h3>
 <br>
-<a href="https://github.com/jdai315"> Jerry Dai </a> : Facebook API, Python/HTML/Javascript, Front end
+<a href="https://github.com/jdai315"> Jerry Dai </a> : Droplet Setup, Facebook API, Python/HTML/Javascript, Front end
 <br>
 <a href="https://github.com/artofelia"> Elia Portnoy </a> : Project Leader, Python/3D graphics using Phoria
 <br>
 <a href="https://github.com/kig12345"> Edison Shi </a> : User controls/HUD, HTML/Javascript/CSS, Front end
+<br>
+<a href="https://www.youtube.com/watch?v=0coupCqGk2Y&feature=youtu.be"> Youtube Video Link </a>
 <br>
 Our project is a 3D maze game.
 <br>
