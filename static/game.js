@@ -39,8 +39,8 @@ function init()
 
 
 	var canvas = document.getElementById('canvas');
-	var posbox = document.getElementById('posbox');
-		canvas.requestPointerLock = canvas.requestPointerLock ||
+	//var posbox = document.getElementById('posbox');
+	canvas.requestPointerLock = canvas.requestPointerLock ||
 		canvas.mozRequestPointerLock ||
 		canvas.webkitRequestPointerLock;
 
@@ -391,7 +391,7 @@ function init()
 	var fnAnimate = function() { //game loop
 		if (!pause)
 		{
-			posbox.innerHTML = "x: " + scene.camera.position.x + " y: " + scene.camera.position.y + " z: " + scene.camera.position.z;
+			//posbox.innerHTML = "x: " + scene.camera.position.x + " y: " + scene.camera.position.y + " z: " + scene.camera.position.z;
 			//time = (new Date()).getTime()-stTime;
 			//console.log(time);
 			//incTrip(time);
