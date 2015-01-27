@@ -122,7 +122,12 @@ def getMazeCoor(pinfo):
     print 'sending maze cor to', pinfo['id']
     
     emit('mazeUpdate', {'key': ky, 'data': {'sz':tmzsz, 'coor': tmz, 'st': tst, 'ed': ted}})
-
+    
+@socketio.on('my broadcast event', namespace='/maze')
+def test_broadcast_message(message):
+    emit('my response',
+        {'data': message['data']},
+        broadcast=True)
 
 if __name__ == '__main__':
     socketio.run(app)

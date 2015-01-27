@@ -256,6 +256,7 @@ function init()
 	socket.on('set_id', function(msg) { //sets your id
 		my_id = msg['id'];
 		console.log('MY ID IS', my_id);
+		username = "Anonymous"+my_id;
 		socket.emit('getMazeCoor', {'id': my_id, 'pos': [my_pos[0], my_pos[1], my_pos[2]]});
 	});
 	socket.on('set_players', function(msg) { //sets other existing players when you join
@@ -494,4 +495,16 @@ function init()
 	}
 		
    requestAnimFrame(fnAnimate);
+   
+   
+   
+   //chat
+	socket.on('my response', function(msg) {
+		$('#log').append('<br>Received: ' + msg.data);
+	});
+	$('form#broadcast').submit(function(event) {
+		socket.emit('my broadcast event', {data: $('#broadcast_data').val()});
+		$('#broadcast_data').val('');
+		return false;
+	});
 }

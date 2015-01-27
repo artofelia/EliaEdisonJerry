@@ -6,12 +6,13 @@
 
 
 body{
-    background-image: url(images/mazelarge.png);
+    /*background-image: url(images/mazelarge.png);*/
+	background-color : transparent;
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center;
-    background-color: #cccccc;
+    /*background-color: #cccccc;*/
     text-align: center;
     text-color: black;
 }

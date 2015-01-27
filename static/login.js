@@ -25,8 +25,8 @@ function statusChangeCallback(response) {
     console.log('statusChangeCallback');
     console.log(response);
     if (response.status === 'connected') {
-	player_connect(response);
-    }else {
+		player_connect(response);
+	}else {
 	player_disconnect(response);
     }
   }
@@ -48,7 +48,7 @@ function player_connect(response) {
 	var player = document.createElement('div');
 	player.id = response.name;
 	player.className = response.name;
-	player.innerHTML = response.name;	
+	player.innerHTML = response.name;
 	document.getElementById("players").appendChild(player);
 	username = response.name;
     });
