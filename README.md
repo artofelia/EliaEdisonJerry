@@ -26,7 +26,11 @@ By logging into Facebook at the bottom of the page, you may invite your friends 
 <br>
 The game will require you to lock your mouse for FPS purposes.
 <br>
-Use the mouse to change camera and the WASD keys to move.
+Use the mouse to change turn and the WASD keys to move. T to move up and G to go down.
+<br>
+Press C to activate/deactivate collisions (you must do this when you begin the game).
+<br>
+The goal is to find the red cube (the finish point)
 <br>
 <h2> Project Timeline </h2>
 Goal Dates:
