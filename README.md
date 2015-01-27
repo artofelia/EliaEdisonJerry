@@ -1,5 +1,5 @@
 <h1> FPS: First-Person-Socialnetwork </h1>
-<h2> Deployment Link <a href="104.236.15.26"> HERE </a>
+<h2> Deployment Link at this IP: 104.236.15.26
 <h3> (Because Facebook saw the domain names from freedns as suspicious, we could only use an IP address to direct to our droplet) </h3>
 <br>
 <a href="https://github.com/jdai315"> Jerry Dai </a> : Facebook API, Python/HTML/Javascript, Front end
